@@ -1,16 +1,57 @@
-# React + Vite
+# Lumen 🌟
 
-Este modelo fornece uma configuração mínima para fazer o React funcionar no Vite com HMR e algumas regras do ESLint.
+> **O Hub Social Definitivo para Programadores e Gamers**
 
-Atualmente, dois plugins oficiais estão disponíveis:
+O **Lumen** é uma plataforma centralizada projetada para conectar mentes criativas e jogadores apaixonados. Mais do que uma rede social, é um hub onde código e jogos se encontram.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) usa [Babel](https://babeljs.io/) (ou [oxc](https://oxc.rs) quando usado em [rolldown-vite](https://vite.dev/guide/rolldown)) para Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) usa [SWC](https://swc.rs/) para Fast Refresh
+🚧 **Status do Projeto**: *Em Desenvolvimento Ativo* 🚧
 
-## Compilador React
+## 🚀 Sobre o Projeto
 
-O Compilador React não está habilitado neste modelo devido ao seu impacto no desempenho de desenvolvimento e build. Para adicioná-lo, veja [esta documentação](https://react.dev/learn/react-compiler/installation).
+O Lumen visa criar um ambiente amigável e produtivo onde você pode:
+-   **Conectar-se**: Encontre parceiros de código ou de equipe para seus jogos favoritos.
+-   **Compartilhar**: Mostre seus projetos, snippets de código ou clipes de jogos.
+-   **Interagir**: Chat em tempo real, sistema de amigos e feed de atualizações.
 
-## Expandindo a configuração do ESLint
+## 🛠️ Tecnologias Utilizadas
 
-Se você estiver desenvolvendo uma aplicação de produção, recomendamos usar TypeScript com regras de lint baseadas em tipos habilitadas. Confira o [modelo TS](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) para informações sobre como integrar TypeScript e [`typescript-eslint`](https://typescript-eslint.io) em seu projeto.
+Este projeto é construído com uma stack moderna e performática:
+
+-   **Frontend**: [React](https://react.dev/)
+-   **Desktop App**: [Electron](https://www.electronjs.org/)
+-   **Build Tool**: [Vite](https://vitejs.dev/)
+-   **Backend/Database**: [Firebase](https://firebase.google.com/)
+
+## 📦 Como Rodar o Projeto
+
+Para rodar o Lumen localmente em sua máquina:
+
+1.  **Clone o repositório**:
+    ```bash
+    git clone https://github.com/RimuSrPao/Lumen.git
+    cd Lumen
+    ```
+
+2.  **Instale as dependências**:
+    ```bash
+    npm install
+    ```
+
+3.  **Inicie o modo de desenvolvimento**:
+    ```bash
+    npm run dev
+    ```
+    *Isso abrirá a versão web no seu navegador.*
+
+4.  **Para rodar a versão Desktop (Electron)**:
+    ```bash
+    npm run electron:dev
+    # ou use o script iniciar_app.bat no Windows
+    ```
+
+## 🤝 Contribuindo
+
+O projeto ainda está em estágios iniciais. Sugestões e pull requests são bem-vindos!
+
+---
+*Desenvolvido com 💜 por RimuSrPao*
