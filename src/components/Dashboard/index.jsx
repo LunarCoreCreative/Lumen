@@ -158,7 +158,7 @@ export function Dashboard({ user }) {
             case 'chat':
                 return <ChatView user={user} onViewProfile={handleViewProfile} />;
             case 'settings':
-                return <Settings user={user} />;
+                return <Settings user={user} onLogout={handleLogout} />;
             default: // 'feed'
                 return (
                     <Feed
@@ -190,7 +190,7 @@ export function Dashboard({ user }) {
                     <Sidebar
                         currentView={currentView}
                         onNavigate={handleNavigate}
-                        unreadChatCount={unreadChatCount}
+                        unreadCount={unreadChatCount}
                         currentUser={user}
                         onLogout={handleLogout}
                     />
@@ -205,7 +205,7 @@ export function Dashboard({ user }) {
                             }
                             handleNavigate(view);
                         }}
-                        unreadCount={unreadChatCount}
+                        unreadCount={unreadCount}
                     />
                 }
                 content={renderContent()}

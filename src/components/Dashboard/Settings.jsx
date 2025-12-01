@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Settings.module.css';
-import { User, Bell, Lock, Palette, Shield } from 'lucide-react';
+import { User, Bell, Lock, Palette, Shield, Info, LogOut } from 'lucide-react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { updateProfile } from 'firebase/auth';
+import { db, auth } from '../../firebase';
 
-export function Settings({ user }) {
+export function Settings({ user, onLogout }) {
     const [activeTab, setActiveTab] = useState('profile');
-    const [settings, setSettings] = useState(null);
+    const [settings, setSettings] = useState({}); // Inicializar com objeto vazio para evitar null
     const [loading, setLoading] = useState(true);
 
     // Carregar configurações ao montar
@@ -22,12 +23,16 @@ export function Settings({ user }) {
     }, [settings]);
 
     const loadSettings = async () => {
-        if (!user?.uid) return;
+        if (!user?.uid) {
+            setLoading(false);
+            return;
+        }
 
         try {
             const userDoc = await getDoc(doc(db, 'users', user.uid));
             if (userDoc.exists()) {
-                const loadedSettings = userDoc.data().settings || {
+                const data = userDoc.data();
+                const loadedSettings = data.settings || {
                     notifications: {
                         likes: true,
                         comments: true,
@@ -47,7 +52,9 @@ export function Settings({ user }) {
                 setSettings(loadedSettings);
 
                 // Aplicar fontSize ao carregar
-                applyFontSize(loadedSettings.preferences?.fontSize);
+                if (loadedSettings?.preferences?.fontSize) {
+                    applyFontSize(loadedSettings.preferences.fontSize);
+                }
             }
         } catch (error) {
             console.error('Erro ao carregar configurações:', error);
@@ -78,10 +85,9 @@ export function Settings({ user }) {
 
     const tabs = [
         { id: 'profile', icon: User, label: 'Perfil' },
-        { id: 'notifications', icon: Bell, label: 'Notificações' },
         { id: 'privacy', icon: Lock, label: 'Privacidade' },
-        { id: 'preferences', icon: Palette, label: 'Preferências' },
         { id: 'account', icon: Shield, label: 'Conta' },
+        { id: 'about', icon: Info, label: 'Sobre' },
     ];
 
     if (loading) {
@@ -124,25 +130,14 @@ export function Settings({ user }) {
                 {/* Main Content */}
                 <div className={styles.main}>
                     {activeTab === 'profile' && <ProfileSettings user={user} />}
-                    {activeTab === 'notifications' && (
-                        <NotificationSettings
-                            settings={settings}
-                            onUpdate={updateSettings}
-                        />
-                    )}
                     {activeTab === 'privacy' && (
                         <PrivacySettings
                             settings={settings}
                             onUpdate={updateSettings}
                         />
                     )}
-                    {activeTab === 'preferences' && (
-                        <PreferencesSettings
-                            settings={settings}
-                            onUpdate={updateSettings}
-                        />
-                    )}
-                    {activeTab === 'account' && <AccountSettings user={user} />}
+                    {activeTab === 'account' && <AccountSettings user={user} onLogout={onLogout} />}
+                    {activeTab === 'about' && <AboutSettings />}
                 </div>
             </div>
         </div>
@@ -152,20 +147,41 @@ export function Settings({ user }) {
 // Profile Settings
 function ProfileSettings({ user }) {
     const [displayName, setDisplayName] = useState(user?.displayName || '');
+    const [message, setMessage] = useState(null);
     const [saving, setSaving] = useState(false);
 
     const handleSave = async () => {
         if (!user?.uid) return;
 
         setSaving(true);
+        setMessage(null);
         try {
+            // 1. Atualizar no Firestore (Banco de Dados)
             await updateDoc(doc(db, 'users', user.uid), {
                 displayName: displayName
             });
-            alert('Perfil atualizado com sucesso!');
+
+            // 2. Tentar atualizar no Auth (Sessão) - Protegido contra falhas
+            try {
+                if (auth.currentUser) {
+                    await updateProfile(auth.currentUser, {
+                        displayName: displayName
+                    });
+                    // Forçar recarregamento do token para atualizar UI
+                    await auth.currentUser.reload();
+                }
+            } catch (authError) {
+                console.warn('Erro ao atualizar perfil no Auth (ignorado para evitar crash):', authError);
+                // Não exibimos erro para o usuário pois o banco já foi atualizado
+            }
+
+            setMessage({ type: 'success', text: 'Perfil atualizado com sucesso!' });
+
+            // Limpar mensagem após 3 segundos
+            setTimeout(() => setMessage(null), 3000);
         } catch (error) {
             console.error('Erro ao salvar:', error);
-            alert('Erro ao salvar alterações');
+            setMessage({ type: 'error', text: 'Erro ao salvar alterações.' });
         } finally {
             setSaving(false);
         }
@@ -200,13 +216,25 @@ function ProfileSettings({ user }) {
                 <span className={styles.hint}>O email não pode ser alterado</span>
             </div>
 
-            <button
-                className={styles.saveButton}
-                onClick={handleSave}
-                disabled={saving}
-            >
-                {saving ? 'Salvando...' : 'Salvar Alterações'}
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <button
+                    className={styles.saveButton}
+                    onClick={handleSave}
+                    disabled={saving}
+                >
+                    {saving ? 'Salvando...' : 'Salvar Alterações'}
+                </button>
+
+                {message && (
+                    <span style={{
+                        color: message.type === 'success' ? '#4caf50' : '#ef4444',
+                        fontSize: '0.9rem',
+                        fontWeight: 500
+                    }}>
+                        {message.text}
+                    </span>
+                )}
+            </div>
         </div>
     );
 }
@@ -428,30 +456,57 @@ function PreferencesSettings({ settings, onUpdate }) {
 }
 
 // Account Settings
-function AccountSettings({ user }) {
+function AccountSettings({ user, onLogout }) {
     return (
         <div className={styles.section}>
             <h2 className={styles.sectionTitle}>Configurações da Conta</h2>
             <p className={styles.sectionDescription}>
-                Gerencie sua conta e dados.
+                Gerencie sua conta e sessão.
             </p>
 
             <div className={styles.settingGroup}>
-                <button className={styles.secondaryButton}>Alterar Senha</button>
+                <button
+                    className={styles.dangerButton}
+                    onClick={onLogout}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}
+                >
+                    <LogOut size={18} />
+                    Sair da Conta
+                </button>
             </div>
+        </div>
+    );
+}
 
-            <div className={styles.settingGroup}>
-                <button className={styles.secondaryButton}>Baixar Meus Dados</button>
-            </div>
+// About Settings
+function AboutSettings() {
+    return (
+        <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>Sobre o Lumen</h2>
+            <div className={styles.aboutContainer} style={{ textAlign: 'center', padding: '2rem 0' }}>
+                <div
+                    style={{
+                        width: '80px',
+                        height: '80px',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                        margin: '0 auto 1.5rem',
+                        boxShadow: '0 0 20px rgba(99, 102, 241, 0.3)'
+                    }}
+                ></div>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Lumen</h3>
+                <p style={{ color: '#888', marginBottom: '2rem' }}>Versão 1.0.0 (Beta)</p>
 
-            <div className={styles.divider}></div>
-
-            <div className={styles.settingGroup}>
-                <h3 className={styles.dangerTitle}>Zona de Perigo</h3>
-                <p className={styles.dangerDescription}>
-                    Ações irreversíveis que afetam permanentemente sua conta.
-                </p>
-                <button className={styles.dangerButton}>Excluir Conta</button>
+                <div style={{ maxWidth: '400px', margin: '0 auto', textAlign: 'left', background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '12px' }}>
+                    <p style={{ marginBottom: '1rem', lineHeight: '1.6' }}>
+                        O Lumen é uma plataforma social moderna focada em conectar pessoas através de comunidades vibrantes.
+                    </p>
+                    <p style={{ fontSize: '0.9rem', color: '#666' }}>
+                        Desenvolvido com ❤️ pela equipe Lumen.
+                        <br />
+                        © 2025 Todos os direitos reservados.
+                    </p>
+                </div>
             </div>
         </div>
     );

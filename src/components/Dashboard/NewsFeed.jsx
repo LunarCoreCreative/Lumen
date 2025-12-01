@@ -33,18 +33,7 @@ export function NewsFeed({ user }) {
         checkAdminStatus();
     }, [user]);
 
-    // Função Dev Temporária
-    const promoteMe = async () => {
-        if (!user?.uid) return;
-        try {
-            await updateDoc(doc(db, 'users', user.uid), { isAdmin: true });
-            setIsAdmin(true);
-            alert("Você agora é Admin! O botão de criar notícia deve aparecer.");
-        } catch (error) {
-            console.error("Erro:", error);
-            alert("Erro ao promover.");
-        }
-    };
+
 
     const confirmDelete = async () => {
         if (!newsToDelete) return;
@@ -102,12 +91,7 @@ export function NewsFeed({ user }) {
                     )}
                 </div>
 
-                {/* Botão DEV Temporário */}
-                {!isAdmin && (
-                    <button onClick={promoteMe} className={styles.devButton}>
-                        <ShieldAlert size={16} /> (DEV) Virar Admin
-                    </button>
-                )}
+
             </div>
 
             {isCreating && (

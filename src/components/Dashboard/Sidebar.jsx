@@ -24,7 +24,6 @@ export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onL
     ];
 
     const settingsItems = [
-        { id: 'notifications', icon: Bell, label: 'Notificações' },
         { id: 'settings', icon: Settings, label: 'Ajustes' },
     ];
 
@@ -77,7 +76,8 @@ export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onL
                         return (
                             <div
                                 key={item.id}
-                                className={styles.navItem}
+                                className={`${styles.navItem} ${currentView === item.id ? styles.active : ''}`}
+                                onClick={() => onNavigate(item.id)}
                             >
                                 <div className={styles.navIconWrapper}>
                                     <Icon size={20} className={styles.navIcon} />
