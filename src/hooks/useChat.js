@@ -201,32 +201,36 @@ export const chatActions = {
     },
 
     // Deletar mensagem (Soft Delete para manter histórico)
-    deleteMessage: async (chatId, messageId) => {
-        if (!chatId || !messageId) return;
+    deleteMessage: async (chatId, messageId, userId) => {
+        if (!chatId || !messageId || !userId) return;
 
         const chatRef = doc(db, 'chats', chatId);
         const messageRef = doc(db, 'chats', chatId, 'messages', messageId);
 
         try {
-            // 1. Soft Delete: Marcar como deletada e limpar conteúdo visível
+            // Buscar mensagem atual para preservar conteúdo original
+            const messageSnap = await getDoc(messageRef);
+            if (!messageSnap.exists()) {
+                throw new Error("Mensagem não encontrada");
+            }
+
+            const originalData = messageSnap.data();
+
+            // 1. Soft Delete: Marcar como deletada e preservar original
             await updateDoc(messageRef, {
                 deletedAt: serverTimestamp(),
-                content: "🚫 Mensagem apagada", // Opcional: manter texto original em outro campo se auditoria for necessária
+                deletedBy: userId,
+                originalContent: originalData.content, // Preservar para auditoria
+                originalImageUrl: originalData.imageUrl || null,
+                content: "Mensagem apagada",
+                imageUrl: null, // Remover imagem visível
                 isDeleted: true
             });
 
-            // 2. Atualizar lastMessage do Chat
-            // Precisamos buscar a última mensagem válida para atualizar o chat
+            // 2. Atualizar lastMessage do Chat se essa era a última mensagem
             const messagesRef = collection(chatRef, 'messages');
             const q = query(messagesRef, orderBy('timestamp', 'desc'), limit(1));
 
-            // Nota: Como acabamos de atualizar a mensagem atual para "Mensagem apagada", 
-            // ela ainda será a última se for a mais recente. 
-            // Se quisermos que o chat mostre "Mensagem apagada" no preview, isso já resolve.
-            // Se quisermos que mostre a PENÚLTIMA mensagem, a lógica seria mais complexa.
-            // Assumindo que "Mensagem apagada" é um status válido para o preview.
-
-            // Atualizamos o lastMessage para refletir que foi apagada
             await updateDoc(chatRef, {
                 lastMessage: "🚫 Mensagem apagada",
                 updatedAt: serverTimestamp()

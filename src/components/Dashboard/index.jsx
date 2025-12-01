@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { signOut } from 'firebase/auth';
-import { auth } from '../../firebase';
+import { ref, set, serverTimestamp as rtdbServerTimestamp } from 'firebase/database';
+import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db, dbRealtime } from '../../firebase';
 
 // Componentes Locais
 import { Sidebar } from './Sidebar';
@@ -13,12 +15,10 @@ import { Notifications } from './Notifications';
 import { useNotifications } from '../../hooks/useNotifications';
 
 // Componentes Externos
-import { ChatView } from '../Chat/ChatView'; // Importando ChatView
+import { ChatView } from '../Chat/ChatView';
 import { useUnreadChatCount } from '../../hooks/useChat';
 import { TextWithEmojis } from '../TextWithEmojis';
-
-// Estilos
-import styles from './DashboardLayout.module.css';
+import { MainLayout } from '../Layout/MainLayout';
 
 export function Dashboard({ user }) {
     const [currentView, setCurrentView] = useState('feed'); // 'feed' | 'profile' | 'notifications' | 'chat'
@@ -27,6 +27,7 @@ export function Dashboard({ user }) {
     // Hook de Notificações
     const { notifications, unreadCount, loading: loadingNotifs, markAllAsRead, markAsRead, clearAllNotifications } = useNotifications(user?.uid);
     const unreadChatCount = useUnreadChatCount(user?.uid);
+
 
     const [targetPostId, setTargetPostId] = useState(null);
     const [targetCommentId, setTargetCommentId] = useState(null);
@@ -47,7 +48,28 @@ export function Dashboard({ user }) {
         }
     }, []);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        if (user?.uid) {
+            try {
+                // Definir como offline no Realtime Database antes de sair
+                const userStatusDatabaseRef = ref(dbRealtime, '/status/' + user.uid);
+                const isOfflineForDatabase = {
+                    state: 'offline',
+                    last_changed: rtdbServerTimestamp(),
+                };
+                await set(userStatusDatabaseRef, isOfflineForDatabase);
+
+                // Definir como offline no Firestore
+                const userStatusFirestoreRef = doc(db, 'users', user.uid);
+                await updateDoc(userStatusFirestoreRef, {
+                    isOnline: false,
+                    lastSeen: serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Erro ao definir offline antes de sair:", error);
+            }
+        }
+
         signOut(auth).catch((error) => console.error("Erro ao sair:", error));
     };
 
@@ -101,40 +123,11 @@ export function Dashboard({ user }) {
         );
     };
 
-    return (
-        <div className={styles.dashboardContainer}>
-            {/* Modal Global */}
-            <Modal
-                isOpen={modalConfig.isOpen}
-                onClose={closeModal}
-                title={modalConfig.title}
-                message={modalConfig.message}
-                type={modalConfig.type}
-                onConfirm={modalConfig.onConfirm}
-            />
-
-            {/* Sidebar */}
-            <Sidebar
-                currentView={currentView}
-                onNavigate={handleNavigate}
-                unreadChatCount={unreadChatCount}
-            />
-
-            {/* Main Content */}
-            <main className={styles.mainContent}>
-                <TopBar
-                    user={user}
-                    onLogout={handleLogout}
-                    onNavigate={(view) => {
-                        if (view === 'profile') {
-                            setViewingUser(user);
-                        }
-                        handleNavigate(view);
-                    }}
-                    unreadCount={unreadCount}
-                />
-
-                {currentView === 'profile' ? (
+    // Configuração de Views
+    const renderContent = () => {
+        switch (currentView) {
+            case 'profile':
+                return (
                     <UserProfile
                         key={viewingUser ? viewingUser.uid : user.uid}
                         user={viewingUser || user}
@@ -145,7 +138,9 @@ export function Dashboard({ user }) {
                         onNavigateToPost={handleGoToPost}
                         onUserClick={handleViewProfile}
                     />
-                ) : currentView === 'notifications' ? (
+                );
+            case 'notifications':
+                return (
                     <Notifications
                         notifications={notifications}
                         loading={loadingNotifs}
@@ -155,9 +150,11 @@ export function Dashboard({ user }) {
                         onClearHistory={handleClearHistory}
                         onUserClick={handleViewProfile}
                     />
-                ) : currentView === 'chat' ? (
-                    <ChatView />
-                ) : (
+                );
+            case 'chat':
+                return <ChatView user={user} onViewProfile={handleViewProfile} />;
+            default: // 'feed'
+                return (
                     <Feed
                         user={user}
                         onShowAlert={showAlert}
@@ -166,16 +163,55 @@ export function Dashboard({ user }) {
                         initialCommentId={targetCommentId}
                         onUserClick={handleViewProfile}
                     />
-                )}
-            </main>
+                );
+        }
+    };
 
-            {/* Friends Sidebar (Right) - Hide on chat view if needed, but keeping for now */}
-            {currentView !== 'chat' && (
-                <FriendsSidebar
-                    user={user}
-                    onUserClick={handleViewProfile}
-                />
-            )}
-        </div >
+    return (
+        <>
+            {/* Modal Global */}
+            <Modal
+                isOpen={modalConfig.isOpen}
+                onClose={closeModal}
+                title={modalConfig.title}
+                message={modalConfig.message}
+                type={modalConfig.type}
+                onConfirm={modalConfig.onConfirm}
+            />
+
+            <MainLayout
+                sidebar={
+                    <Sidebar
+                        currentView={currentView}
+                        onNavigate={handleNavigate}
+                        unreadChatCount={unreadChatCount}
+                        currentUser={user}
+                        onLogout={handleLogout}
+                    />
+                }
+                topbar={
+                    <TopBar
+                        user={user}
+                        onLogout={handleLogout}
+                        onNavigate={(view) => {
+                            if (view === 'profile') {
+                                setViewingUser(user);
+                            }
+                            handleNavigate(view);
+                        }}
+                        unreadCount={unreadCount}
+                    />
+                }
+                content={renderContent()}
+                rightSidebar={
+                    currentView !== 'chat' ? (
+                        <FriendsSidebar
+                            user={user}
+                            onUserClick={handleViewProfile}
+                        />
+                    ) : null
+                }
+            />
+        </>
     );
 }

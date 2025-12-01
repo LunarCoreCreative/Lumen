@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { ref, onValue } from 'firebase/database';
-import { db, dbRealtime } from '../../firebase';
+import { db } from '../../firebase';
 import styles from './FriendsSidebar.module.css';
+import { useIsUserOnline } from '../../hooks/useIsUserOnline';
 
 export function FriendCard({ userId, initialData, onClick }) {
     const [userData, setUserData] = useState(initialData);
-    const [isOnline, setIsOnline] = useState(initialData?.isOnline || false);
+    const isOnline = useIsUserOnline(userId);
 
     useEffect(() => {
         if (!userId) return;
@@ -18,16 +18,8 @@ export function FriendCard({ userId, initialData, onClick }) {
             }
         });
 
-        // Listen for presence changes from Realtime Database
-        const statusRef = ref(dbRealtime, '/status/' + userId);
-        const unsubscribeRealtime = onValue(statusRef, (snapshot) => {
-            const status = snapshot.val();
-            setIsOnline(status?.state === 'online');
-        });
-
         return () => {
             unsubscribeFirestore();
-            unsubscribeRealtime();
         };
     }, [userId]);
 

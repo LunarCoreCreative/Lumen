@@ -50,7 +50,7 @@ function App() {
   return (
     <>
       <TitleBar />
-      <div style={{ paddingTop: '32px', height: '100vh', boxSizing: 'border-box' }}>
+      <div className="appContainer">
         <Suspense fallback={<LoadingScreen />}>
           {resetCode ? (
             <ResetPassword oobCode={resetCode} onBackToLogin={handleBackToLogin} />
@@ -65,4 +65,4 @@ function App() {
   );
 }
 
-export default App;;
+export default App;

@@ -9,7 +9,7 @@
   --border-radius: 8px;
   --transition: 0.2s ease;
 
-  /* Lumen Theme Variables */
+  /* Variáveis do Tema Lumen */
   --lumen-bg: #09090b;
   --lumen-surface: #18181b;
   --lumen-border: #27272a;
@@ -26,14 +26,14 @@
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
 
-  /* Hide scrollbar for IE, Edge and Firefox */
+  /* Esconder barra de rolagem para IE, Edge e Firefox */
   -ms-overflow-style: none;
-  /* IE and Edge */
+  /* IE e Edge */
   scrollbar-width: none;
   /* Firefox */
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
+/* Esconder barra de rolagem para Chrome, Safari e Opera */
 *::-webkit-scrollbar {
   display: none;
 }
@@ -43,12 +43,39 @@ body {
   color: var(--text-primary);
   height: 100vh;
   overflow: hidden;
-  /* -webkit-app-region: drag; REMOVIDO: Causa bloqueio de inputs */
 }
 
+/* 
+  ESTRATÉGIA DE LAYOUT: Coluna Flexbox
+  ------------------------------------
+  Usamos um layout de coluna flexível para a raiz (#root) para garantir que a TitleBar
+  e o Conteúdo do App se empilhem corretamente sem sobreposição.
+  
+  1. #root é flex-direction: column
+  2. TitleBar é flex-shrink: 0 (altura fixa)
+  3. .appContainer é flex: 1 (ocupa o espaço restante)
+  
+  Isso evita a necessidade de posicionamento fixo (fixed) ou alturas calculadas com calc().
+*/
 #root {
   height: 100%;
   width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 
+  Ocupa todo o espaço restante abaixo da TitleBar.
+  Não é necessário margin-top porque está no fluxo flex.
+*/
+.appContainer {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  height: auto;
+  margin-top: 0;
 }
 
 button {

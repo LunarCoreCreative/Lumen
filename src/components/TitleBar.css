@@ -1,17 +1,23 @@
+/*
+  ESTRATÉGIA DA BARRA DE TÍTULO
+  -----------------------------
+  A posição é RELATIVE (não fixed) para participar do fluxo flex do #root.
+  flex-shrink: 0 garante que ela mantenha sua altura de 32px e não encolha.
+*/
 .title-bar {
     height: 32px;
     background-color: #131316;
-    /* Mesma cor do fundo do app */
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    position: relative;
+    /* Importante: Não é fixed! */
     z-index: 10000;
     user-select: none;
     border-bottom: 1px solid #27272a;
+    flex-shrink: 0;
+    /* Importante: Não encolher */
+    width: 100%;
 }
 
 .title-bar-drag-area {
@@ -21,7 +27,6 @@
     align-items: center;
     padding-left: 16px;
     -webkit-app-region: drag;
-    /* Permite arrastar a janela */
 }
 
 .app-title {
@@ -35,7 +40,6 @@
     display: flex;
     height: 100%;
     -webkit-app-region: no-drag;
-    /* Botões não podem ser área de arrastar */
 }
 
 .control-btn {

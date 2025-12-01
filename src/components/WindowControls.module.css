@@ -1,0 +1,31 @@
+.windowControls {
+    position: fixed;
+    top: 0;
+    right: 0;
+    display: flex;
+    z-index: 9999;
+    -webkit-app-region: no-drag;
+}
+
+.controlBtn {
+    width: 46px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--lumen-text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.controlBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--lumen-text);
+}
+
+.closeBtn:hover {
+    background: #ef4444;
+    color: white;
+}

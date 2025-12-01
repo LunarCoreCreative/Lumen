@@ -1,0 +1,327 @@
+.windowContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.emptyState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--lumen-text-dim);
+}
+
+.emptyContent {
+    text-align: center;
+}
+
+.emptyContent h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--lumen-text);
+}
+
+.header {
+    height: 70px;
+    min-height: 70px;
+    max-height: 70px;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(24, 24, 27, 0.4);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    flex-shrink: 0;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.userInfo:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.avatarWrapper {
+    position: relative;
+}
+
+.avatar,
+.avatarPlaceholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatarPlaceholder {
+    background: linear-gradient(135deg, var(--lumen-primary), #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+}
+
+.onlineIndicator {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background-color: #10b981;
+    border-radius: 50%;
+    border: 2px solid #18181b;
+}
+
+.userDetails {
+    display: flex;
+    flex-direction: column;
+}
+
+.userName {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--lumen-text);
+}
+
+.userStatus {
+    font-size: 0.8rem;
+    color: var(--lumen-primary);
+}
+
+.headerActions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.iconBtn {
+    background: transparent;
+    border: none;
+    color: var(--lumen-text-dim);
+    padding: 0.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.iconBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--lumen-text);
+}
+
+.messagesArea {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 0;
+}
+
+.messagesArea::-webkit-scrollbar {
+    width: 6px;
+}
+
+.messagesArea::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.loading,
+.emptyMessages {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--lumen-text-dim);
+}
+
+.messageRow {
+    display: flex;
+    max-width: 70%;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.messageRow.me {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.messageRow.them {
+    align-self: flex-start;
+}
+
+.messageBubble {
+    padding: 0.8rem 1.2rem;
+    border-radius: 18px;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    cursor: context-menu;
+}
+
+.messageRow.me .messageBubble {
+    background: linear-gradient(135deg, var(--lumen-primary), #8b5cf6);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.messageRow.them .messageBubble {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: var(--lumen-text);
+    border-bottom-left-radius: 4px;
+}
+
+.messageBubble.deleted {
+    cursor: default;
+    opacity: 0.7;
+}
+
+.messageTime {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    align-self: flex-end;
+}
+
+.contextMenu {
+    position: fixed;
+    background: rgba(24, 24, 27, 0.98);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 0.5rem;
+    min-width: 150px;
+    z-index: 10000;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    animation: slideDown 0.15s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.contextMenu button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    background: transparent;
+    border: none;
+    color: var(--lumen-text);
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.15s;
+}
+
+.contextMenu button:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.contextMenu button.deleteBtn {
+    color: #ef4444;
+}
+
+.contextMenu button.deleteBtn:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.replyPreview {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-left: 3px solid var(--lumen-primary);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--lumen-text-dim);
+}
+
+.replyBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.5rem;
+    margin: 0 2rem;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+    flex-shrink: 0;
+}
+
+.replyContent {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--lumen-primary);
+    font-size: 0.9rem;
+}
+
+.replyContent span {
+    color: var(--lumen-text-dim);
+}
+
+.cancelReply {
+    background: transparent;
+    border: none;
+    color: var(--lumen-text-dim);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 0.5rem;
+    transition: color 0.2s;
+}
+
+.cancelReply:hover {
+    color: var(--lumen-text);
+}
+
+.deletedMessage {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-style: italic;
+    opacity: 0.6;
+}
+
+.deletedIcon {
+    font-size: 1rem;
+}
+
+.deletedText {
+    font-size: 0.9rem;
+    color: var(--lumen-text-dim);
+}

@@ -44,7 +44,7 @@ export function usePresence(userId) {
             }
         });
 
-        // Cleanup manual ao desmontar (opcional, pois onDisconnect cuida do fechamento abrupto)
+        // Cleanup manual ao desmontar
         return () => {
             unsubscribe();
             set(userStatusDatabaseRef, isOfflineForDatabase);

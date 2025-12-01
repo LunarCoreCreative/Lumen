@@ -1,0 +1,47 @@
+/*
+    LAYOUT PRINCIPAL
+    ----------------
+    Herda height: 100% do .appContainer (que é flex: 1).
+    Isso garante que preencha exatamente o espaço abaixo da TitleBar.
+*/
+.layoutContainer {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background-color: var(--lumen-bg);
+    color: var(--lumen-text);
+    overflow: hidden;
+}
+
+.leftSidebar {
+    flex-shrink: 0;
+    z-index: 20;
+}
+
+.mainColumn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.topBarWrapper {
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.contentWrapper {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.rightSidebar {
+    flex-shrink: 0;
+    z-index: 20;
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
