@@ -58,6 +58,7 @@ jobs:
         with:
           artifacts: "dist-electron/*.exe"
           token: ${{ secrets.GITHUB_TOKEN }}
+          tag: v${{ steps.get_version.outputs.VERSION }}
           draft: false
           prerelease: false
           body: |
