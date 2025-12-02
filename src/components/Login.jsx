@@ -248,15 +248,42 @@ export function Login() {
             <div style={{
                 position: 'fixed',
                 bottom: '20px',
-                right: '20px', // Canto inferior direito
-                color: 'rgba(255, 255, 255, 0.3)', // Um pouco mais discreto na imagem
+                right: '20px',
+                color: 'rgba(255, 255, 255, 0.5)',
                 fontSize: '0.75rem',
                 fontWeight: '500',
                 zIndex: 9999,
-                pointerEvents: 'none',
-                fontFamily: 'Inter, sans-serif'
+                fontFamily: 'Inter, sans-serif',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
             }}>
-                v{packageJson?.version || '0.0.0'}
+                <span>v{packageJson?.version || '0.0.0'}</span>
+                {window.electronAPI && (
+                    <button
+                        onClick={() => window.electronAPI.checkForUpdates()}
+                        style={{
+                            background: 'none',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            borderRadius: '4px',
+                            color: 'inherit',
+                            padding: '2px 6px',
+                            cursor: 'pointer',
+                            fontSize: '0.7rem',
+                            transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.target.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                            e.target.style.color = 'rgba(255, 255, 255, 0.8)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                            e.target.style.color = 'rgba(255, 255, 255, 0.5)';
+                        }}
+                    >
+                        Verificar Atualizações
+                    </button>
+                )}
             </div>
         </div>
     );
