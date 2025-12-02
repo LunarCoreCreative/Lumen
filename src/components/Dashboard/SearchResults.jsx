@@ -34,7 +34,7 @@ export function SearchResults({ searchQuery, user, onUserClick, onShowAlert, onS
                 const usersSnapshot = await getDocs(usersQuery);
 
                 const filteredUsers = usersSnapshot.docs
-                    .map(doc => ({ id: doc.id, ...doc.data() }))
+                    .map(doc => ({ uid: doc.id, id: doc.id, ...doc.data() }))
                     .filter(u =>
                         (u.displayName && u.displayName.toLowerCase().includes(term)) ||
                         (u.email && u.email.toLowerCase().includes(term))
