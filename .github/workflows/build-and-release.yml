@@ -29,7 +29,7 @@ jobs:
         run: npm run build
 
       - name: Build Electron (Windows)
-        run: npm run build:win
+        run: npm run build:win -- -c.publish=never
 
       - name: Get version from tag or package.json
         id: get_version
