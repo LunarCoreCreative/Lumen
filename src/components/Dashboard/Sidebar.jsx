@@ -138,8 +138,8 @@ export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onL
                     <LogOut size={18} />
                 </button>
             </div>
-            <div style={{ position: 'absolute', bottom: '5px', right: '10px', fontSize: '11px', color: '#4caf50', fontWeight: 'bold' }}>
-                v0.0.9 🚀
+            <div style={{ position: 'absolute', bottom: '5px', right: '10px', fontSize: '11px', color: '#2196f3', fontWeight: 'bold' }}>
+                v0.0.10 ✨
             </div>
         </aside>
     );
