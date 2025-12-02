@@ -10,8 +10,12 @@ publish:
   owner: RimuSrPao
   repo: Lumen
 win:
+  forceCodeSigning: false  # Desabilita assinatura de código (evita problemas de permissão)
   target:
     - target: nsis
+      arch:
+        - x64
+    - target: portable  # Versão portátil (sem instalador)
       arch:
         - x64
 nsis:
