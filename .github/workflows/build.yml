@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'  # Dispara quando você criar uma tag como v0.1.0, v0.2.0, etc.
 
+permissions:
+  contents: write  # Necessário para criar releases
+
 jobs:
   build:
     runs-on: windows-latest
