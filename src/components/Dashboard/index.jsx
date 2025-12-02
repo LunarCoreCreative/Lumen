@@ -27,6 +27,7 @@ import { MainLayout } from '../Layout/MainLayout';
 export function Dashboard({ user }) {
     const [currentView, setCurrentView] = useState('feed'); // 'feed' | 'profile' | 'notifications' | 'chat'
     const [viewingUser, setViewingUser] = useState(null); // Usuário sendo visualizado no perfil
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Hook de Notificações
     const { notifications, unreadCount, loading: loadingNotifs, markAllAsRead, markAsRead, clearAllNotifications } = useNotifications(user?.uid);
@@ -174,6 +175,7 @@ export function Dashboard({ user }) {
                         initialPostId={targetPostId}
                         initialCommentId={targetCommentId}
                         onUserClick={handleViewProfile}
+                        searchQuery={searchQuery}
                     />
                 );
         }
@@ -212,6 +214,7 @@ export function Dashboard({ user }) {
                             handleNavigate(view);
                         }}
                         unreadCount={unreadCount}
+                        onSearch={setSearchQuery}
                     />
                 }
                 content={renderContent()}
