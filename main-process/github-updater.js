@@ -21,9 +21,8 @@ let currentVersion = null;
 function initialize(win) {
     mainWindow = win;
 
-    // Pegar versão do package.json
-    const packageJson = require('../package.json');
-    currentVersion = packageJson.version;
+    // Pegar versão do app (mais confiável que require package.json)
+    currentVersion = app.getVersion();
 
     log.info('GitHub Auto-Updater inicializado, versão atual:', currentVersion);
 
@@ -60,7 +59,9 @@ async function checkForUpdates() {
         const updateData = updateDoc.data();
         const latestVersion = updateData.currentVersion;
 
-        log.info(`Versão atual: ${currentVersion}, Versão disponível: ${latestVersion}`);
+        log.info(`Versão atual (app.getVersion): ${currentVersion}`);
+        log.info(`Versão no Firestore: ${latestVersion}`);
+        log.info(`Dados do Firestore:`, JSON.stringify(updateData, null, 2));
 
         // Comparar versões
         if (compareVersions(latestVersion, currentVersion) > 0) {
