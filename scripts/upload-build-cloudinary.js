@@ -8,7 +8,7 @@ const FormData = require('form-data');
 
 // Configuração do Cloudinary
 const CLOUD_NAME = 'dasntpbd3';
-const UPLOAD_PRESET = 'lumen_builds'; // Você precisará criar este preset no Cloudinary
+const UPLOAD_PRESET = 'ml_default'; // Usando preset signed existente
 
 /**
  * Faz upload de um build para o Cloudinary e atualiza Firestore
