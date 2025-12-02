@@ -256,7 +256,7 @@ export function Login() {
                 fontFamily: 'Inter, sans-serif',
                 pointerEvents: 'none'
             }}>
-                v{packageJson?.version || '0.0.0'}
+                v{packageJson?.version || '0.0.0'} <span style={{ color: 'rgba(59, 130, 246, 0.8)', marginLeft: '4px' }}>Alpha</span>
             </div>
         </div>
     );
