@@ -256,7 +256,8 @@ export function Login() {
                 fontFamily: 'Inter, sans-serif',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '8px',
+                WebkitAppRegion: 'no-drag'
             }}>
                 <span>v{packageJson?.version || '0.0.0'}</span>
                 {window.electronAPI && (
