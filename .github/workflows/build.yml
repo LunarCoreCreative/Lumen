@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*'  # Dispara quando você criar uma tag como v0.1.0, v0.2.0, etc.
+  workflow_dispatch: # Permite disparar manualmente
 
 permissions:
   contents: write  # Necessário para criar releases
