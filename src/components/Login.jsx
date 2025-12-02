@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './Login.css';
 import { auth, googleProvider } from '../firebase';
 import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, sendPasswordResetEmail, fetchSignInMethodsForEmail } from 'firebase/auth';
@@ -14,6 +14,15 @@ export function Login() {
     const [error, setError] = useState('');
     const [isResetPassword, setIsResetPassword] = useState(false);
     const [toast, setToast] = useState(null); // { message, type }
+    const [updateAvailable, setUpdateAvailable] = useState(false);
+
+    useEffect(() => {
+        if (window.electronAPI) {
+            window.electronAPI.onUpdateAvailable(() => {
+                setUpdateAvailable(true);
+            });
+        }
+    }, []);
 
     const showToast = (message, type = 'info') => {
         setToast({ message, type });
@@ -271,18 +280,32 @@ export function Login() {
                             padding: '2px 6px',
                             cursor: 'pointer',
                             fontSize: '0.7rem',
-                            transition: 'all 0.2s'
+                            transition: 'all 0.2s',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            position: 'relative'
                         }}
                         onMouseEnter={(e) => {
-                            e.target.style.borderColor = 'rgba(255, 255, 255, 0.5)';
-                            e.target.style.color = 'rgba(255, 255, 255, 0.8)';
+                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)';
                         }}
                         onMouseLeave={(e) => {
-                            e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                            e.target.style.color = 'rgba(255, 255, 255, 0.5)';
+                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)';
                         }}
                     >
-                        Verificar Atualizações
+                        {updateAvailable && (
+                            <span style={{
+                                width: '6px',
+                                height: '6px',
+                                backgroundColor: '#ef4444',
+                                borderRadius: '50%',
+                                display: 'inline-block',
+                                boxShadow: '0 0 4px #ef4444'
+                            }}></span>
+                        )}
+                        {updateAvailable ? 'Atualizar Agora' : 'Verificar Atualizações'}
                     </button>
                 )}
             </div>
