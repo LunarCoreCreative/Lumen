@@ -28,6 +28,8 @@ jobs:
         run: npm run build
 
       - name: Build Electron (Windows)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build:win
 
       - name: Create Release
