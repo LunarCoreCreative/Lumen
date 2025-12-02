@@ -1,4 +1,4 @@
-name: Build and Release to Cloudinary
+name: Build and Release to GitHub
 
 on:
   push:
@@ -29,8 +29,6 @@ jobs:
         run: npm run build
 
       - name: Build Electron (Windows)
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build:win
 
       - name: Get version from tag or package.json
