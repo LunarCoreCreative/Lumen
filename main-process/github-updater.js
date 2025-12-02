@@ -1,4 +1,4 @@
-const { db } = require('../firebase');
+const { db } = require('./firebase-main');
 const { doc, getDoc } = require('firebase/firestore');
 const { app } = require('electron');
 const https = require('https');
