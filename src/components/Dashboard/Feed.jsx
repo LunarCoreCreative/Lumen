@@ -5,7 +5,7 @@ import { CreatePost } from './CreatePost';
 import { PostCard } from './PostCard';
 import styles from './Feed.module.css';
 
-export function Feed({ user, onShowAlert, onShowConfirm, initialPostId, initialCommentId, onUserClick, searchQuery }) {
+export function Feed({ user, onShowAlert, onShowConfirm, initialPostId, initialCommentId, onUserClick }) {
     const [feedMode, setFeedMode] = useState('global'); // 'global' | 'friends'
     const { friends, loading: friendsLoading } = useUserFriends(user.uid);
 
@@ -14,14 +14,6 @@ export function Feed({ user, onShowAlert, onShowConfirm, initialPostId, initialC
 
     // Passar friendIds apenas se estiver no modo 'friends'
     const { posts, loading, error } = usePosts(null, feedMode === 'friends' ? friendIds : null);
-
-    const filteredPosts = posts.filter(post => {
-        if (!searchQuery) return true;
-        const query = searchQuery.toLowerCase();
-        const contentMatch = post.content?.toLowerCase().includes(query);
-        const authorMatch = post.author?.name?.toLowerCase().includes(query);
-        return contentMatch || authorMatch;
-    });
 
     useEffect(() => {
         if (!loading && initialPostId) {
@@ -80,12 +72,12 @@ export function Feed({ user, onShowAlert, onShowConfirm, initialPostId, initialC
                     <p>Você ainda não tem amigos adicionados.</p>
                     <p>Adicione amigos para ver seus posts aqui!</p>
                 </div>
-            ) : filteredPosts.length === 0 && !loading ? (
+            ) : posts.length === 0 && !loading ? (
                 <div className={styles.emptyState}>
                     <p>Nenhum post encontrado.</p>
                 </div>
             ) : (
-                filteredPosts.map(post => (
+                posts.map(post => (
                     <div key={post.id} id={`post-${post.id}`}>
                         <PostCard
                             post={post}

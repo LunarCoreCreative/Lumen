@@ -17,6 +17,7 @@ import { NewsFeed } from './NewsFeed';
 import { Settings } from './Settings';
 import { GamingHub } from './GamingHub';
 import { OwnerPanel } from './OwnerPanel';
+import { SearchResults } from './SearchResults';
 
 // Componentes Externos
 import { ChatView } from '../Chat/ChatView';
@@ -25,7 +26,7 @@ import { TextWithEmojis } from '../TextWithEmojis';
 import { MainLayout } from '../Layout/MainLayout';
 
 export function Dashboard({ user }) {
-    const [currentView, setCurrentView] = useState('feed'); // 'feed' | 'profile' | 'notifications' | 'chat'
+    const [currentView, setCurrentView] = useState('feed'); // 'feed' | 'profile' | 'notifications' | 'chat' | 'search'
     const [viewingUser, setViewingUser] = useState(null); // Usuário sendo visualizado no perfil
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -128,9 +129,30 @@ export function Dashboard({ user }) {
         );
     };
 
+    const handleSearch = (query) => {
+        setSearchQuery(query);
+        if (query && query.trim() !== '') {
+            setCurrentView('search');
+        } else {
+            if (currentView === 'search') {
+                setCurrentView('feed');
+            }
+        }
+    };
+
     // Configuração de Views
     const renderContent = () => {
         switch (currentView) {
+            case 'search':
+                return (
+                    <SearchResults
+                        searchQuery={searchQuery}
+                        user={user}
+                        onUserClick={handleViewProfile}
+                        onShowAlert={showAlert}
+                        onShowConfirm={showConfirm}
+                    />
+                );
             case 'profile':
                 return (
                     <UserProfile
@@ -175,7 +197,6 @@ export function Dashboard({ user }) {
                         initialPostId={targetPostId}
                         initialCommentId={targetCommentId}
                         onUserClick={handleViewProfile}
-                        searchQuery={searchQuery}
                     />
                 );
         }
@@ -214,7 +235,7 @@ export function Dashboard({ user }) {
                             handleNavigate(view);
                         }}
                         unreadCount={unreadCount}
-                        onSearch={setSearchQuery}
+                        onSearch={handleSearch}
                     />
                 }
                 content={renderContent()}

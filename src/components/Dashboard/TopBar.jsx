@@ -5,25 +5,28 @@ import styles from './TopBar.module.css';
 export function TopBar({ user, onLogout, onNavigate, unreadCount, onSearch }) {
     return (
         <header className={styles.topBar}>
-            <h2
-                className={styles.pageTitle}
-                onClick={() => onNavigate && onNavigate('feed')}
-                title="Voltar para o Feed"
-            >
-                Página Inicial
-            </h2>
+            <div className={styles.leftSection}>
+                <h2
+                    className={styles.pageTitle}
+                    onClick={() => onNavigate && onNavigate('feed')}
+                    title="Voltar para o Feed"
+                >
+                    Página Inicial
+                </h2>
 
-            <div className={styles.searchContainer}>
-                <svg className={styles.searchIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <input
-                    type="text"
-                    placeholder="Pesquisar no Lumen..."
-                    className={styles.searchInput}
-                    onChange={(e) => onSearch && onSearch(e.target.value)}
-                />
+                {/* Search Input */}
+                <div className={styles.searchContainer}>
+                    <svg className={styles.searchIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input
+                        type="text"
+                        placeholder="Pesquisar..."
+                        className={styles.searchInput}
+                        onChange={(e) => onSearch && onSearch(e.target.value)}
+                    />
+                </div>
             </div>
 
             <div className={styles.userProfileHeader}>
