@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const updater = require('./updater');
+const updater = require('./cloudinary-updater');
 
 
 ipcMain.on('resize-window', (event, width, height) => {

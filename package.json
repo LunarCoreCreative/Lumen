@@ -1,7 +1,7 @@
 {
   "name": "lumen",
   "private": true,
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "main-process/main.js",
   "author": "BCG",
   "description": "Lumen - Plataforma Social",
@@ -18,7 +18,8 @@
     "electron:build": "vite build && electron-builder",
     "build:win": "vite build && electron-builder --win",
     "publish:win": "vite build && electron-builder --win --publish always",
-    "publish:draft": "vite build && electron-builder --win --publish never"
+    "publish:draft": "vite build && electron-builder --win --publish never",
+    "upload-build": "node scripts/upload-build-cloudinary.js"
   },
   "dependencies": {
     "date-fns": "^4.1.0",
@@ -26,6 +27,7 @@
     "electron-updater": "^6.6.2",
     "emoji-picker-react": "^4.16.1",
     "firebase": "^12.6.0",
+    "form-data": "^4.0.5",
     "lucide-react": "^0.555.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -45,7 +47,9 @@
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
+    "firebase-admin": "^12.0.0",
     "globals": "^16.5.0",
+    "jsonwebtoken": "^9.0.2",
     "vite": "^7.2.4",
     "wait-on": "^9.0.3"
   }

@@ -5,10 +5,6 @@ directories:
 files:
   - dist/**/*
   - main-process/**/*
-publish:
-  provider: github
-  owner: LunarCoreCreative
-  repo: Lumen
 win:
   forceCodeSigning: false  # Desabilita assinatura de código (evita problemas de permissão)
   target:
