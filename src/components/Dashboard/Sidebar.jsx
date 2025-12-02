@@ -137,7 +137,9 @@ export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onL
                 <button className={styles.logoutBtn} title="Sair" onClick={onLogout}>
                     <LogOut size={18} />
                 </button>
-            </div>
+                <div style={{ position: 'absolute', bottom: '5px', right: '10px', fontSize: '10px', color: '#666' }}>
+                    v0.0.4
+                </div>
         </aside>
     );
 }
