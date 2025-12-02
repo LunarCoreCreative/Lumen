@@ -1,0 +1,21 @@
+appId: com.lumen.app
+productName: Lumen
+directories:
+  output: dist-electron
+files:
+  - dist/**/*
+  - main-process/**/*
+publish:
+  provider: github
+  owner: RimuSrPao
+  repo: Lumen
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true

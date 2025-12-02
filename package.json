@@ -1,20 +1,24 @@
 {
-  "name": "app-teste",
+  "name": "lumen",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "main-process/main.js",
   "author": "BCG",
-  "description": "Sistema de Login AppTeste",
+  "description": "Lumen - Plataforma Social",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "electron:dev": "concurrently -k \"cross-env BROWSER=none npm run dev\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
-    "electron:build": "vite build && electron-builder"
+    "electron:build": "vite build && electron-builder",
+    "build:win": "vite build && electron-builder --win",
+    "publish:win": "vite build && electron-builder --win --publish always",
+    "publish:draft": "vite build && electron-builder --win --publish never"
   },
   "dependencies": {
     "date-fns": "^4.1.0",
+    "electron-updater": "^6.6.2",
     "emoji-picker-react": "^4.16.1",
     "firebase": "^12.6.0",
     "lucide-react": "^0.555.0",
@@ -38,19 +42,5 @@
     "globals": "^16.5.0",
     "vite": "^7.2.4",
     "wait-on": "^9.0.3"
-  },
-  "build": {
-    "appId": "com.appteste.app",
-    "productName": "AppTeste",
-    "directories": {
-      "output": "dist-electron"
-    },
-    "files": [
-      "dist/**/*",
-      "main-process/**/*"
-    ],
-    "win": {
-      "target": "nsis"
-    }
   }
 }

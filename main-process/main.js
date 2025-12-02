@@ -1,5 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const updater = require('./updater');
+
 
 ipcMain.on('resize-window', (event, width, height) => {
     const win = BrowserWindow.fromWebContents(event.sender);
@@ -36,6 +38,20 @@ ipcMain.on('close-window', (event) => {
         win.close();
     }
 });
+
+// Handlers de autoupdate
+ipcMain.on('check-for-updates', () => {
+    updater.checkForUpdates();
+});
+
+ipcMain.on('download-update', () => {
+    updater.downloadUpdate();
+});
+
+ipcMain.on('install-update', () => {
+    updater.installUpdate();
+});
+
 
 function createWindow() {
     const win = new BrowserWindow({
@@ -80,6 +96,15 @@ function createWindow() {
 
 app.whenReady().then(() => {
     createWindow();
+
+    // Inicializar autoupdate apenas em produção
+    const isDev = process.env.NODE_ENV === 'development';
+    if (!isDev) {
+        const win = BrowserWindow.getAllWindows()[0];
+        if (win) {
+            updater.initialize(win);
+        }
+    }
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {

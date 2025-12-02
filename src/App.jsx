@@ -4,6 +4,7 @@ import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
 import { TitleBar } from './components/TitleBar';
+import UpdateNotification from './components/UpdateNotification/UpdateNotification';
 
 // Lazy Loading dos componentes principais
 const Login = lazy(() => import('./components/Login').then(module => ({ default: module.Login })));
@@ -50,6 +51,7 @@ function App() {
   return (
     <>
       <TitleBar />
+      <UpdateNotification />
       <div className="appContainer">
         <Suspense fallback={<LoadingScreen />}>
           {resetCode ? (
