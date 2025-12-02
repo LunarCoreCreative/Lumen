@@ -139,7 +139,7 @@ export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onL
                 </button>
             </div>
             <div style={{ position: 'absolute', bottom: '5px', right: '10px', fontSize: '10px', color: '#666' }}>
-                v0.0.4
+                v0.0.5
             </div>
         </aside>
     );
