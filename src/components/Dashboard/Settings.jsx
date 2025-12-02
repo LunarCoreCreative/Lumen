@@ -457,6 +457,90 @@ function PreferencesSettings({ settings, onUpdate }) {
 
 // Account Settings
 function AccountSettings({ user, onLogout }) {
+    const [adminCode, setAdminCode] = useState('');
+    const [ownerCode, setOwnerCode] = useState('');
+    const [message, setMessage] = useState(null);
+    const [ownerMessage, setOwnerMessage] = useState(null);
+    const [saving, setSaving] = useState(false);
+    const [ownerSaving, setOwnerSaving] = useState(false);
+
+    // Hash SHA-256 dos códigos secretos
+    // Admin: LUMEN_ADMIN_2025_SECURE
+    const ADMIN_CODE_HASH = '0b9b1f23062e04d9af60e76f09792fa7cf588c0e6eb5e5f242e80224405a616e';
+    // Owner: LUMEN_OWNER_2025_MASTER
+    const OWNER_CODE_HASH = '05f56df0136ab1819dc0fcf71b4cbb36bec6b516bf07a3d6167eaf3c77a4ad94';
+
+    const generateHash = async (text) => {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    };
+
+    const handleActivateAdmin = async () => {
+        if (!user?.uid) return;
+
+        setSaving(true);
+        setMessage(null);
+
+        try {
+            // Usar sistema de códigos de uso único
+            const { validateAndUseAdminCode } = await import('../../utils/adminCodes');
+            const result = await validateAndUseAdminCode(adminCode, user.uid);
+
+            if (!result.success) {
+                setMessage({ type: 'error', text: result.error || 'Código inválido!' });
+                setTimeout(() => setMessage(null), 3000);
+                setSaving(false);
+                return;
+            }
+
+            setMessage({ type: 'success', text: 'Você agora é um administrador! Recarregando...' });
+            setAdminCode('');
+
+            setTimeout(() => window.location.reload(), 2000);
+        } catch (error) {
+            console.error('Erro ao ativar admin:', error);
+            setMessage({ type: 'error', text: 'Erro ao ativar permissões de admin.' });
+            setSaving(false);
+        }
+    };
+
+    const handleActivateOwner = async () => {
+        if (!user?.uid) return;
+
+        setOwnerSaving(true);
+        setOwnerMessage(null);
+
+        try {
+            const inputHash = await generateHash(ownerCode);
+
+            if (inputHash !== OWNER_CODE_HASH) {
+                setOwnerMessage({ type: 'error', text: 'Código de owner inválido!' });
+                setTimeout(() => setOwnerMessage(null), 3000);
+                setOwnerSaving(false);
+                return;
+            }
+
+            await updateDoc(doc(db, 'users', user.uid), {
+                isOwner: true,
+                isAdmin: true, // Owner também é admin
+                ownerActivatedAt: new Date().toISOString(),
+                adminActivatedAt: new Date().toISOString()
+            });
+
+            setOwnerMessage({ type: 'success', text: '👑 Você agora é o OWNER! Recarregando...' });
+            setOwnerCode('');
+
+            setTimeout(() => window.location.reload(), 2000);
+        } catch (error) {
+            console.error('Erro ao ativar owner:', error);
+            setOwnerMessage({ type: 'error', text: 'Erro ao ativar permissões de owner.' });
+            setOwnerSaving(false);
+        }
+    };
+
     return (
         <div className={styles.section}>
             <h2 className={styles.sectionTitle}>Configurações da Conta</h2>
@@ -465,6 +549,95 @@ function AccountSettings({ user, onLogout }) {
             </p>
 
             <div className={styles.settingGroup}>
+                <label className={styles.label}>Código de Desenvolvedor</label>
+                <p className={styles.sectionDescription} style={{ marginBottom: '1rem', fontSize: '0.875rem' }}>
+                    Insira o código de uso único gerado pelo Owner para se tornar administrador.
+                </p>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                    <input
+                        type="text"
+                        className={styles.input}
+                        value={adminCode}
+                        onChange={(e) => setAdminCode(e.target.value.toUpperCase())}
+                        placeholder="LUMEN-XXXX-XXXX-XXXX"
+                        style={{ flex: 1, fontFamily: 'monospace', letterSpacing: '0.05em' }}
+                        onKeyPress={(e) => {
+                            if (e.key === 'Enter' && adminCode) {
+                                handleActivateAdmin();
+                            }
+                        }}
+                    />
+                    <button
+                        className={styles.saveButton}
+                        onClick={handleActivateAdmin}
+                        disabled={saving || !adminCode}
+                        style={{ minWidth: '120px' }}
+                    >
+                        {saving ? 'Ativando...' : 'Ativar Admin'}
+                    </button>
+                </div>
+                {message && (
+                    <div style={{
+                        marginTop: '0.75rem',
+                        padding: '0.75rem',
+                        borderRadius: '8px',
+                        background: message.type === 'success' ? 'rgba(76, 175, 80, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                        border: `1px solid ${message.type === 'success' ? 'rgba(76, 175, 80, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                        color: message.type === 'success' ? '#4caf50' : '#ef4444',
+                        fontSize: '0.875rem',
+                        fontWeight: 500
+                    }}>
+                        {message.text}
+                    </div>
+                )}
+            </div>
+
+            {/* Owner Code Section */}
+            <div className={styles.settingGroup} style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                <label className={styles.label}>👑 Código de Owner</label>
+                <p className={styles.sectionDescription} style={{ marginBottom: '1rem', fontSize: '0.875rem' }}>
+                    Código exclusivo para ativar permissões de  proprietário do sistema.
+                </p>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                    <input
+                        type="password"
+                        className={styles.input}
+                        value={ownerCode}
+                        onChange={(e) => setOwnerCode(e.target.value)}
+                        placeholder="Digite o código de owner"
+                        style={{ flex: 1 }}
+                        onKeyPress={(e) => {
+                            if (e.key === 'Enter' && ownerCode) {
+                                handleActivateOwner();
+                            }
+                        }}
+                    />
+                    <button
+                        className={styles.saveButton}
+                        onClick={handleActivateOwner}
+                        disabled={ownerSaving || !ownerCode}
+                        style={{ minWidth: '120px', background: 'linear-gradient(135deg, #ffd700 0%, #ffaa00 100%)', color: '#000' }}
+                    >
+                        {ownerSaving ? 'Ativando...' : 'Ativar Owner'}
+                    </button>
+                </div>
+                {ownerMessage && (
+                    <div style={{
+                        marginTop: '0.75rem',
+                        padding: '0.75rem',
+                        borderRadius: '8px',
+                        background: ownerMessage.type === 'success' ? 'rgba(255, 215, 0, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                        border: `1px solid ${ownerMessage.type === 'success' ? 'rgba(255, 215, 0, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                        color: ownerMessage.type === 'success' ? '#ffd700' : '#ef4444',
+                        fontSize: '0.875rem',
+                        fontWeight: 500
+                    }}>
+                        {ownerMessage.text}
+                    </div>
+                )}
+            </div>
+
+            <div className={styles.settingGroup} style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                 <button
                     className={styles.dangerButton}
                     onClick={onLogout}

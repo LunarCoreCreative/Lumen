@@ -15,6 +15,8 @@ import { Notifications } from './Notifications';
 import { useNotifications } from '../../hooks/useNotifications';
 import { NewsFeed } from './NewsFeed';
 import { Settings } from './Settings';
+import { GamingHub } from './GamingHub';
+import { OwnerPanel } from './OwnerPanel';
 
 // Componentes Externos
 import { ChatView } from '../Chat/ChatView';
@@ -155,6 +157,10 @@ export function Dashboard({ user }) {
                 );
             case 'news':
                 return <NewsFeed user={user} />;
+            case 'hub':
+                return <GamingHub user={user} />;
+            case 'owner':
+                return <OwnerPanel user={user} />;
             case 'chat':
                 return <ChatView user={user} onViewProfile={handleViewProfile} />;
             case 'settings':

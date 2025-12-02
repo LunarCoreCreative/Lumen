@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Sidebar.module.css';
-import { Home, Megaphone, MessageCircle, Settings, User, LogOut, Bell } from 'lucide-react';
+import { Home, Megaphone, MessageCircle, Settings, User, LogOut, Bell, Gamepad2, Crown } from 'lucide-react';
 import { ref, onValue } from 'firebase/database';
 import { dbRealtime } from '../../firebase';
+import { useIsOwner } from '../../hooks/useIsOwner';
 
 export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onLogout }) {
     const [isOnline, setIsOnline] = useState(false);
+    const { isOwner } = useIsOwner(currentUser);
 
     // Monitorar status de conexão do próprio usuário
     useEffect(() => {
@@ -19,6 +21,7 @@ export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onL
 
     const menuItems = [
         { id: 'feed', icon: Home, label: 'Feed', active: true },
+        { id: 'hub', icon: Gamepad2, label: 'Hub', active: true },
         { id: 'news', icon: Megaphone, label: 'Novidades', active: true },
         { id: 'chat', icon: MessageCircle, label: 'Mensagens', badge: unreadCount },
     ];
@@ -86,6 +89,19 @@ export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onL
                             </div>
                         );
                     })}
+
+                    {/* Owner Menu Item - Only visible for owners */}
+                    {isOwner && (
+                        <div
+                            className={`${styles.navItem} ${currentView === 'owner' ? styles.active : ''} ${styles.ownerItem}`}
+                            onClick={() => onNavigate('owner')}
+                        >
+                            <div className={styles.navIconWrapper}>
+                                <Crown size={20} className={styles.navIcon} style={{ color: '#ffd700' }} />
+                            </div>
+                            <span className={styles.navLabel} style={{ color: '#ffd700' }}>Owner Panel</span>
+                        </div>
+                    )}
                 </div>
             </nav>
 
