@@ -41,18 +41,15 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 
-      - name: Upload to Cloudinary and Update Firestore
+      - name: Update Firestore with GitHub Release Info
         env:
-          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
-          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
-          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
           FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
           FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
         run: |
-          node scripts/ci-upload-cloudinary.js ${{ steps.get_version.outputs.VERSION }} "Automated release from GitHub Actions"
+          node scripts/ci-update-firestore.js ${{ steps.get_version.outputs.VERSION }} "Automated release from GitHub Actions"
 
-      - name: Create GitHub Release (Optional)
+      - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
           artifacts: "dist-electron/*.exe"
@@ -60,5 +57,7 @@ jobs:
           draft: false
           prerelease: false
           body: |
-            Auto-update available via Cloudinary
+            Auto-update available!
             Version: ${{ steps.get_version.outputs.VERSION }}
+            
+            Download will start automatically when you open the app.

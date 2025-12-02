@@ -35,3 +35,4 @@ Desktop.ini
 
 # Firebase Admin SDK credentials
 scripts/firebase-service-account.json
+scripts/lumen-*.json
