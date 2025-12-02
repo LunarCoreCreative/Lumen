@@ -13,6 +13,28 @@ O Lumen visa criar um ambiente amigável e produtivo onde você pode:
 -   **Compartilhar**: Mostre seus projetos, snippets de código ou clipes de jogos.
 -   **Interagir**: Chat em tempo real, sistema de amigos e feed de atualizações.
 
+## ✨ Funcionalidades Principais
+
+### 🎮 Gaming Hub
+Um espaço dedicado para suas comunidades de jogos favoritas.
+-   **No Man's Sky**: Compartilhe e descubra receitas de refinamento, coordenadas e dicas.
+-   **Em Breve**: Suporte para mais jogos e ferramentas comunitárias.
+
+### 📰 News Feed & Dashboard
+Mantenha-se atualizado com o que está acontecendo.
+-   **Feed de Notícias**: Artigos e novidades sobre desenvolvimento e jogos.
+-   **Postagens**: Compartilhe seus pensamentos com suporte a markdown e blocos de código.
+-   **Comentários**: Interaja com a comunidade através de threads de comentários.
+
+### 👥 Social & Perfil
+-   **Sistema de Amigos**: Adicione amigos, veja status online/offline em tempo real.
+-   **Perfil Personalizável**: Altere seu avatar, banner e informações pessoais.
+-   **Chat em Tempo Real**: Converse com seus amigos instantaneamente.
+
+### 🛡️ Administração
+-   **Owner Panel**: Ferramentas exclusivas para gerenciamento da plataforma.
+-   **Moderação**: Controle de conteúdo e usuários para manter a comunidade segura.
+
 ## 🛠️ Tecnologias Utilizadas
 
 Este projeto é construído com uma stack moderna e performática:
@@ -20,7 +42,7 @@ Este projeto é construído com uma stack moderna e performática:
 -   **Frontend**: [React](https://react.dev/)
 -   **Desktop App**: [Electron](https://www.electronjs.org/)
 -   **Build Tool**: [Vite](https://vitejs.dev/)
--   **Backend/Database**: [Firebase](https://firebase.google.com/)
+-   **Backend/Database**: [Firebase](https://firebase.google.com/) (Firestore, Auth, Storage)
 
 ## 📦 Como Rodar o Projeto
 
@@ -37,13 +59,17 @@ Para rodar o Lumen localmente em sua máquina:
     npm install
     ```
 
-3.  **Inicie o modo de desenvolvimento**:
+3.  **Configure o Firebase**:
+    - Crie um projeto no Firebase Console.
+    - Crie um arquivo `.env` na raiz do projeto com suas credenciais.
+
+4.  **Inicie o modo de desenvolvimento**:
     ```bash
     npm run dev
     ```
     *Isso abrirá a versão web no seu navegador.*
 
-4.  **Para rodar a versão Desktop (Electron)**:
+5.  **Para rodar a versão Desktop (Electron)**:
     ```bash
     npm run electron:dev
     # ou use o script iniciar_app.bat no Windows
