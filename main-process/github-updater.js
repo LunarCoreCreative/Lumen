@@ -317,12 +317,18 @@ function calculateSha512(filePath) {
 }
 
 /**
- * Compara duas versões semânticas
+ * Compara duas versões semânticas (suporta pre-release como -Alpha, -Beta)
  * @returns {number} 1 se v1 > v2, -1 se v1 < v2, 0 se iguais
  */
 function compareVersions(v1, v2) {
-    const parts1 = v1.split('.').map(Number);
-    const parts2 = v2.split('.').map(Number);
+    // Separar versão principal de pre-release
+    // Ex: "0.1.0-Alpha" => ["0.1.0", "Alpha"]
+    const [version1, prerelease1] = v1.split('-');
+    const [version2, prerelease2] = v2.split('-');
+
+    // Comparar versões principais (0.1.0 vs 0.0.10)
+    const parts1 = version1.split('.').map(Number);
+    const parts2 = version2.split('.').map(Number);
 
     for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
         const part1 = parts1[i] || 0;
@@ -330,6 +336,19 @@ function compareVersions(v1, v2) {
 
         if (part1 > part2) return 1;
         if (part1 < part2) return -1;
+    }
+
+    // Se as versões principais são iguais, comparar pre-release
+    // Regra: versão sem pre-release é MAIOR que versão com pre-release
+    // Ex: 0.1.0 > 0.1.0-Alpha
+    if (!prerelease1 && prerelease2) return 1;  // v1 é release, v2 é pre-release
+    if (prerelease1 && !prerelease2) return -1; // v1 é pre-release, v2 é release
+
+    // Ambos têm pre-release ou ambos não têm
+    if (prerelease1 && prerelease2) {
+        // Comparação alfabética simples (Beta > Alpha, etc)
+        if (prerelease1 > prerelease2) return 1;
+        if (prerelease1 < prerelease2) return -1;
     }
 
     return 0;
