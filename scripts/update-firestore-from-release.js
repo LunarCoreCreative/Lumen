@@ -107,7 +107,12 @@ function parseLatestYml(ymlContent) {
     if (filesIndex !== -1) {
         // Procurar por 'url:', 'sha512:', 'size:' após 'files:'
         for (let i = filesIndex + 1; i < lines.length; i++) {
-            const line = lines[i].trim();
+            let line = lines[i].trim();
+
+            // Remover o hífen de array YAML se existir (ex: "- url:" vira "url:")
+            if (line.startsWith('- ')) {
+                line = line.substring(2).trim();
+            }
 
             if (line.startsWith('url:')) {
                 // Remove 'url: ' e qualquer aspas
