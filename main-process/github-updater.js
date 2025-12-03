@@ -227,15 +227,15 @@ function installUpdate(sender = null) {
 
     log.info('🚀 Instalando atualização...');
 
-    // Avisar o usuário
-    if (targetWindow) {
-        dialog.showMessageBoxSync(targetWindow, {
-            type: 'info',
-            title: 'Instalando',
-            message: 'O aplicativo será fechado para iniciar a instalação.',
-            buttons: ['OK']
-        });
-    }
+    // Avisar o usuário (Removido para usar UI customizada no React)
+    // if (targetWindow) {
+    //     dialog.showMessageBoxSync(targetWindow, {
+    //         type: 'info',
+    //         title: 'Instalando',
+    //         message: 'O aplicativo será fechado para iniciar a instalação.',
+    //         buttons: ['OK']
+    //     });
+    // }
 
     // Executar instalador (sem /S para mostrar a interface e possíveis erros)
     // Usar spawn em vez de execFile para garantir que o processo se solte do pai
