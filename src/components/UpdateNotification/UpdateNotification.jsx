@@ -2,48 +2,40 @@ import { useState, useEffect } from 'react';
 import styles from './UpdateNotification.module.css';
 
 const UpdateNotification = () => {
-    const [updateState, setUpdateState] = useState('idle'); // idle, checking, available, downloading, downloaded, error
+    const [updateState, setUpdateState] = useState('idle');
     const [updateInfo, setUpdateInfo] = useState(null);
     const [downloadProgress, setDownloadProgress] = useState(0);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Verificar se estamos em ambiente Electron
         if (!window.electronAPI) {
             return;
         }
 
-        // Configurar listeners de eventos
         window.electronAPI.onUpdateAvailable((info) => {
-            console.log('Atualização disponível:', info);
             setUpdateState('available');
             setUpdateInfo(info);
         });
 
         window.electronAPI.onUpdateNotAvailable(() => {
-            console.log('App está atualizado');
             setUpdateState('idle');
         });
 
         window.electronAPI.onDownloadProgress((progress) => {
-            console.log('Progresso do download:', progress);
             setUpdateState('downloading');
             setDownloadProgress(Math.round(progress.percent));
         });
 
         window.electronAPI.onUpdateDownloaded((info) => {
-            console.log('Atualização baixada:', info);
             setUpdateState('downloaded');
             setDownloadProgress(100);
         });
 
         window.electronAPI.onUpdateError((error) => {
-            console.error('Erro no update:', error);
             setUpdateState('error');
             setError(error.message);
         });
 
-        // Forçar verificação ao montar o componente
         window.electronAPI.checkForUpdates();
     }, []);
 

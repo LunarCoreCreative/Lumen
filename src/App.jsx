@@ -50,7 +50,7 @@ function App() {
 
   return (
     <>
-      <TitleBar />
+      {/* <TitleBar /> - Usando barra nativa do Windows por enquanto */}
       <UpdateNotification />
       <div className="appContainer">
         <Suspense fallback={<LoadingScreen />}>

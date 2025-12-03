@@ -4,6 +4,22 @@
     top: 0;
     left: 0;
     right: 0;
+    bottom: 0;
+    z-index: 99999;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease-out;
+    -webkit-app-region: no-drag !important;
+    pointer-events: auto !important;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
 
     to {
         opacity: 1;
@@ -20,6 +36,9 @@
     width: 90%;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     animation: slideUp 0.4s ease-out;
+    -webkit-app-region: no-drag !important;
+    cursor: default;
+    pointer-events: auto !important;
 }
 
 @keyframes slideUp {
@@ -120,6 +139,8 @@
     transition: all 0.2s ease;
     border: none;
     outline: none;
+    -webkit-app-region: no-drag;
+    pointer-events: auto;
 }
 
 .btnPrimary {
@@ -159,6 +180,7 @@
     background: rgba(255, 255, 255, 0.1);
     transform: none;
 }
+
 /* Toast notification for silent updates */
 .toast {
     position: fixed;
@@ -173,6 +195,7 @@
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;

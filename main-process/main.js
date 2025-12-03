@@ -10,16 +10,16 @@ app.whenReady().then(async () => {
     // Verificação de atualização apenas em produção
     const isDev = process.env.NODE_ENV === 'development';
 
-    if (!isDev) {
-        // Aguardar janela estar pronta
-        await new Promise(resolve => setTimeout(resolve, 2000));
+    // if (!isDev) { // Comentado para teste em dev
+    // Aguardar janela estar pronta
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
-        // Inicializar autoupdate system
-        const win2 = BrowserWindow.getAllWindows()[0];
-        if (win2) {
-            updater.initialize(win2);
-        }
+    // Inicializar autoupdate system
+    const win2 = BrowserWindow.getAllWindows()[0];
+    if (win2) {
+        updater.initialize(win2);
     }
+    // }
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {
@@ -65,6 +65,8 @@ ipcMain.on('close-window', (event) => {
     }
 });
 
+
+
 // Handlers de autoupdate
 ipcMain.on('check-for-updates', (event) => {
     updater.checkForUpdates(event.sender);
@@ -80,30 +82,31 @@ ipcMain.on('install-update', (event) => {
 
 
 function createWindow() {
+    const preloadPath = path.join(app.getAppPath(), 'preload.js');
+
     const win = new BrowserWindow({
         width: 1000,
         height: 700,
         minWidth: 800,
         minHeight: 600,
         resizable: true,
-        backgroundColor: '#1a1a1a', // Cor de fundo escura para evitar flash branco
-        frame: false, // Remove a barra de título e bordas padrão do Windows
-        titleBarStyle: 'hidden', // Necessário para alguns comportamentos de drag
+        backgroundColor: '#1a1a1a',
+        frame: true,
+        autoHideMenuBar: true,
+        title: 'Lumen', // Título da janela
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
-            preload: path.join(__dirname, 'preload.js')
+            sandbox: false,
+            webSecurity: false,
+            preload: preloadPath
         },
-        autoHideMenuBar: true,
     });
-
 
     const isDev = process.env.NODE_ENV === 'development';
 
     if (isDev) {
-        // Aguarda um pouco para garantir que o Vite subiu, ou usa wait-on no script
         win.loadURL('http://localhost:5173');
-        // win.webContents.openDevTools(); // Opcional: abrir devtools automaticamente
     } else {
         // Em produção, servir via HTTP local (localhost) para compatibilidade total com Firebase Auth e Google OAuth
         const http = require('http');

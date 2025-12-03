@@ -45,11 +45,11 @@ async function checkForUpdates(sender = null) {
     // Determinar qual WebContents usar para responder
     const targetSender = sender || (mainWindow ? mainWindow.webContents : null);
 
-    // Não verificar em desenvolvimento
-    if (process.env.NODE_ENV === 'development') {
-        log.info('Modo desenvolvimento - verificação de updates desabilitada');
-        return;
-    }
+    // Não verificar em desenvolvimento (Comentado para debug)
+    // if (process.env.NODE_ENV === 'development') {
+    //     log.info('Modo desenvolvimento - verificação de updates desabilitada');
+    //     return;
+    // }
 
     isUpdateInProgress = true;
 
@@ -84,11 +84,14 @@ async function checkForUpdates(sender = null) {
             log.info('✨ Nova versão disponível!');
 
             if (targetSender) {
+                console.log('📤 Enviando evento update-available para a UI');
                 // Enviar evento para a UI (UpdateNotification.jsx)
                 targetSender.send('update-available', {
                     version: latestVersion,
                     changelog: updateData.changelog || ''
                 });
+            } else {
+                console.log('⚠️ targetSender é null! Não consigo enviar evento para a UI.');
             }
         } else {
             log.info('App está atualizado');
