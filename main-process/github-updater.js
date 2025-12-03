@@ -33,12 +33,21 @@ function initialize(win) {
 /**
  * Verifica se há atualizações disponíveis
  */
+let isUpdateInProgress = false;
+
+/**
+ * Verifica se há atualizações disponíveis
+ */
 async function checkForUpdates() {
+    if (isUpdateInProgress) return;
+
     // Não verificar em desenvolvimento
     if (process.env.NODE_ENV === 'development') {
         log.info('Modo desenvolvimento - verificação de updates desabilitada');
         return;
     }
+
+    isUpdateInProgress = true;
 
     try {
         log.info('🔍 Verificando atualizações no Firestore...');
@@ -55,6 +64,7 @@ async function checkForUpdates() {
             if (mainWindow) {
                 mainWindow.webContents.send('update-not-available');
             }
+            isUpdateInProgress = false;
             return;
         }
 
@@ -85,6 +95,8 @@ async function checkForUpdates() {
                 if (response === 0) {
                     // Baixar atualização
                     await downloadUpdate();
+                } else {
+                    isUpdateInProgress = false;
                 }
             }
         } else {
@@ -92,6 +104,7 @@ async function checkForUpdates() {
             if (mainWindow) {
                 mainWindow.webContents.send('update-not-available');
             }
+            isUpdateInProgress = false;
         }
 
     } catch (error) {
@@ -101,6 +114,7 @@ async function checkForUpdates() {
                 message: `Erro ao verificar atualizações: ${error.message}`
             });
         }
+        isUpdateInProgress = false;
     }
 }
 
@@ -108,6 +122,11 @@ async function checkForUpdates() {
  * Inicia o download da atualização do GitHub Releases
  */
 async function downloadUpdate() {
+    // Nota: isUpdateInProgress já deve ser true aqui se veio do checkForUpdates
+    // Mas por segurança, mantemos ou verificamos. 
+    // Como chamamos diretamente do checkForUpdates, não precisamos setar true de novo, 
+    // mas precisamos garantir que seja false no final (finally).
+
     try {
         log.info('📥 Iniciando download da atualização do GitHub...');
 
@@ -190,6 +209,8 @@ async function downloadUpdate() {
                 message: `Erro ao baixar atualização: ${error.message}`
             });
         }
+    } finally {
+        isUpdateInProgress = false;
     }
 }
 
@@ -207,17 +228,28 @@ function installUpdate() {
 
     log.info('🚀 Instalando atualização...');
 
-    // Executar instalador
-    execFile(global.updatePath, ['/S'], (error) => {
-        if (error) {
-            log.error('Erro ao executar instalador:', error);
-        }
+    // Avisar o usuário
+    if (mainWindow) {
+        dialog.showMessageBoxSync(mainWindow, {
+            type: 'info',
+            title: 'Instalando',
+            message: 'O aplicativo será fechado para iniciar a instalação.',
+            buttons: ['OK']
+        });
+    }
+
+    // Executar instalador (sem /S para mostrar a interface e possíveis erros)
+    // Usar spawn em vez de execFile para garantir que o processo se solte do pai
+    const { spawn } = require('child_process');
+    const subprocess = spawn(global.updatePath, [], {
+        detached: true,
+        stdio: 'ignore'
     });
 
-    // Fechar app após 1 segundo
-    setTimeout(() => {
-        app.quit();
-    }, 1000);
+    subprocess.unref();
+
+    // Fechar app
+    app.quit();
 }
 
 /**
