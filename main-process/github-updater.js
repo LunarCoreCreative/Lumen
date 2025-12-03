@@ -1,4 +1,4 @@
-const { app } = require('electron');
+const { app, dialog } = require('electron');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
@@ -70,14 +70,22 @@ async function checkForUpdates() {
             log.info('✨ Nova versão disponível!');
 
             if (mainWindow) {
-                mainWindow.webContents.send('update-available', {
-                    version: latestVersion,
-                    releaseNotes: updateData.changelog || '',
-                    releaseDate: updateData.releaseDate,
-                    downloadUrl: updateData.downloadUrl,
-                    fileSize: updateData.fileSize,
-                    sha512: updateData.sha512
+                const logMessage = `📱 Versão atual: ${currentVersion}\n✅ Nova versão: ${latestVersion}\n\n${updateData.changelog || ''}`;
+
+                const { response } = await dialog.showMessageBox(mainWindow, {
+                    type: 'info',
+                    title: '🎉 Atualização Disponível!',
+                    message: `Nova versão ${latestVersion} disponível!`,
+                    detail: logMessage,
+                    buttons: ['Baixar e Instalar', 'Mais Tarde'],
+                    defaultId: 0,
+                    cancelId: 1
                 });
+
+                if (response === 0) {
+                    // Baixar atualização
+                    await downloadUpdate();
+                }
             }
         } else {
             log.info('App está atualizado');
@@ -137,16 +145,24 @@ async function downloadUpdate() {
 
         log.info('✅ Download concluído e verificado!');
 
-        // Notificar que download foi concluído
-        if (mainWindow) {
-            mainWindow.webContents.send('update-downloaded', {
-                version: updateData.currentVersion,
-                path: downloadPath
-            });
-        }
-
         // Guardar caminho para instalação
         global.updatePath = downloadPath;
+
+        // Perguntar se quer instalar
+        if (mainWindow) {
+            const installResponse = await dialog.showMessageBox(mainWindow, {
+                type: 'info',
+                title: 'Download Concluído',
+                message: 'Atualização baixada!',
+                detail: 'Deseja instalar agora? O app será fechado.',
+                buttons: ['Instalar', 'Depois'],
+                defaultId: 0
+            });
+
+            if (installResponse.response === 0) {
+                installUpdate();
+            }
+        }
 
     } catch (error) {
         log.error('Erro ao baixar atualização:', error);
