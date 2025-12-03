@@ -45,13 +45,13 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 
-      - name: Update Firestore with GitHub Release Info
+      - name: Update Firestore with Release Info
         env:
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
           FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
           FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
         run: |
-          node scripts/ci-update-firestore.js ${{ steps.get_version.outputs.VERSION }} "Automated release from GitHub Actions"
+          node scripts/update-firestore-from-release.js
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1

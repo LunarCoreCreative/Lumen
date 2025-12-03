@@ -13,6 +13,9 @@ try {
         downloadUpdate: () => ipcRenderer.send('download-update'),
         installUpdate: () => ipcRenderer.send('install-update'),
 
+        // Obter versão do app
+        getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+
         // Listeners de eventos de update
         onUpdateAvailable: (callback) => {
             console.log('PRELOAD: Recebido update-available do Main');

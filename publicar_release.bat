@@ -1,21 +1,35 @@
 @echo off
 chcp 65001 >nul
 echo ========================================
-echo   LUMEN - PUBLICAR RELEASE NO GITHUB
+echo   LUMEN - PUBLICAR RELEASE COMPLETO
 echo ========================================
 echo.
 
-REM Configurar token do GitHub (Defina GH_TOKEN nas variáveis de ambiente se necessário)
-REM set GH_TOKEN=seu_token_aqui
+REM Verificar se as variáveis de ambiente do Firebase estão configuradas
+if "%FIREBASE_PROJECT_ID%"=="" (
+    echo ❌ ERRO: Variáveis de ambiente do Firebase não configuradas!
+    echo.
+    echo Configure as seguintes variáveis:
+    echo   - FIREBASE_PROJECT_ID
+    echo   - FIREBASE_CLIENT_EMAIL
+    echo   - FIREBASE_PRIVATE_KEY
+    echo.
+    echo Ou defina-as temporariamente neste script.
+    pause
+    exit /b 1
+)
 
-echo Token do GitHub configurado ✓
+REM Ler versão do package.json
+for /f "tokens=2 delims=:, " %%a in ('findstr /C:"\"version\"" package.json') do set VERSION=%%a
+set VERSION=%VERSION:"=%
+echo Versão atual: %VERSION%
 echo.
+
 echo ⚠️  ATENÇÃO: Este comando irá:
-echo    - Fazer build do projeto
-echo    - Criar instalador
-echo    - Publicar automaticamente no GitHub Releases
-echo.
-echo Versão atual: 0.1.0
+echo    1. Fazer build do projeto
+echo    2. Criar instalador
+echo    3. Publicar automaticamente no GitHub Releases
+echo    4. Atualizar o Firestore com SHA512 e URL de download
 echo.
 set /p confirma="Deseja continuar? (S/N): "
 if /i not "%confirma%"=="S" (
@@ -25,13 +39,14 @@ if /i not "%confirma%"=="S" (
 )
 
 echo.
-echo Publicando release...
-echo (Isso pode levar alguns minutos)
+echo ========================================
+echo   ETAPA 1/2: Publicando no GitHub
+echo ========================================
 echo.
 call npm run publish:win
 if %errorlevel% neq 0 (
     echo.
-    echo ❌ ERRO: Publicação falhou!
+    echo ❌ ERRO: Publicação no GitHub falhou!
     echo.
     echo Possíveis causas:
     echo - Token do GitHub inválido ou expirado
@@ -42,17 +57,38 @@ if %errorlevel% neq 0 (
     pause
     exit /b 1
 )
+
+echo.
+echo ========================================
+echo   ETAPA 2/2: Atualizando Firestore
+echo ========================================
+echo.
+echo Aguardando 5 segundos para garantir que o release foi publicado...
+timeout /t 5 /nobreak >nul
 echo.
 
+call npm run update-firestore
+if %errorlevel% neq 0 (
+    echo.
+    echo ❌ ERRO: Atualização do Firestore falhou!
+    echo.
+    echo O release foi publicado no GitHub, mas o Firestore não foi atualizado.
+    echo Você pode tentar atualizar manualmente executando:
+    echo   npm run update-firestore
+    echo.
+    pause
+    exit /b 1
+)
+
+echo.
 echo ========================================
-echo   ✅ PUBLICADO COM SUCESSO!
+echo   ✅ PUBLICAÇÃO COMPLETA COM SUCESSO!
 echo ========================================
 echo.
-echo Acesse: https://github.com/RimuSrPao/Lumen/releases
+echo Release v%VERSION% publicado e Firestore atualizado!
 echo.
-echo Próximos passos:
-echo 1. Verifique a release no GitHub
-echo 2. Adicione notas de versão (changelog)
-echo 3. Publique a release (se estiver como draft)
+echo Acesse: https://github.com/LunarCoreCreative/Lumen/releases
+echo.
+echo Os usuários receberão a atualização automaticamente! 🎉
 echo.
 pause

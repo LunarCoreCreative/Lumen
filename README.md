@@ -75,6 +75,38 @@ Para rodar o Lumen localmente em sua máquina:
     # ou use o script iniciar_app.bat no Windows
     ```
 
+## 🔄 Sistema de Auto-Update
+
+O Lumen possui um sistema de atualização automática integrado! Quando uma nova versão é lançada:
+
+1. ✅ O app detecta automaticamente a atualização
+2. ✅ Baixa em segundo plano
+3. ✅ Instala ao fechar o app
+4. ✅ Notifica o usuário de forma sutil
+
+### 📦 Publicar uma Nova Versão
+
+**Via GitHub Actions (Recomendado):**
+
+1. Atualize a versão no `package.json`
+2. Execute:
+   ```bash
+   .\criar_release.bat
+   ```
+3. O GitHub Actions fará automaticamente:
+   - Build do instalador
+   - Publicação no GitHub Releases
+   - Atualização do Firestore com SHA512 e URL
+
+**Documentação completa:** [`docs/RELEASE_GUIDE.md`](docs/RELEASE_GUIDE.md)
+
+## 📚 Documentação Adicional
+
+- 🚀 **[Guia de Release](docs/RELEASE_GUIDE.md)** - Como publicar novas versões
+- 🔄 **[Auto-Update Guide](docs/AUTO_UPDATE_GUIDE.md)** - Sistema de atualização automática
+- 🔥 **[Firebase Setup](docs/FIREBASE_AUTO_UPDATE_SETUP.md)** - Configuração do Firebase para updates
+
+
 ## 🤝 Contribuindo
 
 O projeto ainda está em estágios iniciais. Sugestões e pull requests são bem-vindos!

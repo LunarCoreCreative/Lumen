@@ -1,7 +1,7 @@
 {
   "name": "lumen",
   "private": true,
-  "version": "0.0.10",
+  "version": "0.1.0-Alpha",
   "main": "main-process/main.js",
   "author": "BCG",
   "description": "Lumen - Plataforma Social",
@@ -19,7 +19,8 @@
     "build:win": "vite build && electron-builder --win",
     "publish:win": "vite build && electron-builder --win --publish always",
     "publish:draft": "vite build && electron-builder --win --publish never",
-    "upload-build": "node scripts/upload-build-cloudinary.js"
+    "upload-build": "node scripts/upload-build-cloudinary.js",
+    "update-firestore": "node scripts/update-firestore-from-release.js"
   },
   "dependencies": {
     "date-fns": "^4.1.0",

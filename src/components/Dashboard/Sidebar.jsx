@@ -7,6 +7,7 @@ import { useIsOwner } from '../../hooks/useIsOwner';
 
 export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onLogout }) {
     const [isOnline, setIsOnline] = useState(false);
+    const [appVersion, setAppVersion] = useState('0.0.0');
     const { isOwner } = useIsOwner(currentUser);
 
     // Monitorar status de conexão do próprio usuário
@@ -17,6 +18,15 @@ export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onL
         });
 
         return () => unsubscribe();
+    }, []);
+
+    // Obter versão do app
+    useEffect(() => {
+        if (window.electronAPI?.getAppVersion) {
+            window.electronAPI.getAppVersion().then(version => {
+                setAppVersion(version);
+            });
+        }
     }, []);
 
     const menuItems = [
@@ -139,7 +149,7 @@ export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onL
                 </button>
             </div>
             <div style={{ position: 'absolute', bottom: '5px', right: '10px', fontSize: '11px', color: '#ff9800', fontWeight: 'bold' }}>
-                v0.0.12 🍊
+                v{appVersion} 🍊
             </div>
         </aside>
     );

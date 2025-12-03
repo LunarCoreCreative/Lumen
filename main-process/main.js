@@ -80,6 +80,12 @@ ipcMain.on('install-update', (event) => {
     updater.installUpdate(event.sender);
 });
 
+// Handler para obter versão do app
+ipcMain.handle('get-app-version', () => {
+    return app.getVersion();
+});
+
+
 
 function createWindow() {
     const preloadPath = path.join(app.getAppPath(), 'preload.js');
