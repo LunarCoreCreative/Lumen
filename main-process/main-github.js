@@ -1,96 +1,6 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const updater = require('./github-updater');
-
-// ... (rest of the file remains the same until app.whenReady)
-
-app.whenReady().then(async () => {
-    createWindow();
-
-    // Verificação de atualização apenas em produção
-    const isDev = process.env.NODE_ENV === 'development';
-
-    if (!isDev) {
-        // Aguardar janela estar pronta
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        const win = BrowserWindow.getAllWindows()[0];
-        if (win) {
-            try {
-                const { db } = require('./firebase-main');
-                const { doc, getDoc } = require('firebase/firestore');
-
-                const currentVersion = app.getVersion();
-                const updateDoc = await getDoc(doc(db, 'config', 'updates'));
-
-                if (updateDoc.exists()) {
-                    const updateData = updateDoc.data();
-                    const latestVersion = updateData.currentVersion;
-
-                    // Função para comparar versões
-                    const compareVersions = (v1, v2) => {
-                        const parts1 = v1.split('.').map(Number);
-                        const parts2 = v2.split('.').map(Number);
-                        for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
-                            const part1 = parts1[i] || 0;
-                            const part2 = parts2[i] || 0;
-                            if (part1 > part2) return 1;
-                            if (part1 < part2) return -1;
-                        }
-                        return 0;
-                    };
-
-                    // Se houver nova versão disponível
-                    if (compareVersions(latestVersion, currentVersion) > 0) {
-                        const logMessage = `📱 Versão atual: ${currentVersion}\n✅ Nova versão: ${latestVersion}\n\n${updateData.changelog || ''}`;
-
-                        const { response } = await dialog.showMessageBox(win, {
-                            type: 'info',
-                            title: '🎉 Atualização Disponível!',
-                            message: `Nova versão ${latestVersion} disponível!`,
-                            detail: logMessage,
-                            buttons: ['Baixar e Instalar', 'Mais Tarde'],
-                            defaultId: 0,
-                            cancelId: 1
-                        });
-
-                        if (response === 0) {
-                            // Baixar atualização
-                            await updater.downloadUpdate();
-
-                            const installResponse = await dialog.showMessageBox(win, {
-                                type: 'info',
-                                title: 'Download Concluído',
-                                message: 'Atualização baixada!',
-                                detail: 'Deseja instalar agora? O app será fechado.',
-                                buttons: ['Instalar', 'Depois'],
-                                defaultId: 0
-                            });
-
-                            if (installResponse.response === 0) {
-                                updater.installUpdate();
-                            }
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('Erro ao verificar atualizações:', error);
-            }
-        }
-
-        // Inicializar autoupdate system
-        const win2 = BrowserWindow.getAllWindows()[0];
-        if (win2) {
-            updater.initialize(win2);
-        }
-    }
-
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
-            createWindow();
-        }
-    });
-});
 
 
 ipcMain.on('resize-window', (event, width, height) => {
@@ -217,6 +127,25 @@ function createWindow() {
         };
     });
 }
+
+app.whenReady().then(() => {
+    createWindow();
+
+    // Inicializar autoupdate apenas em produção
+    const isDev = process.env.NODE_ENV === 'development';
+    if (!isDev) {
+        const win = BrowserWindow.getAllWindows()[0];
+        if (win) {
+            updater.initialize(win);
+        }
+    }
+
+    app.on('activate', () => {
+        if (BrowserWindow.getAllWindows().length === 0) {
+            createWindow();
+        }
+    });
+});
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {

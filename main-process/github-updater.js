@@ -1,5 +1,3 @@
-const { db } = require('./firebase-main');
-const { doc, getDoc } = require('firebase/firestore');
 const { app } = require('electron');
 const https = require('https');
 const fs = require('fs');
@@ -44,6 +42,10 @@ async function checkForUpdates() {
 
     try {
         log.info('🔍 Verificando atualizações no Firestore...');
+
+        // Importar firebase apenas quando necessário
+        const { db } = require('./firebase-main');
+        const { doc, getDoc } = require('firebase/firestore');
 
         // Buscar informações da última versão no Firestore
         const updateDoc = await getDoc(doc(db, 'config', 'updates'));
@@ -100,6 +102,10 @@ async function checkForUpdates() {
 async function downloadUpdate() {
     try {
         log.info('📥 Iniciando download da atualização do GitHub...');
+
+        // Importar firebase apenas quando necessário
+        const { db } = require('./firebase-main');
+        const { doc, getDoc } = require('firebase/firestore');
 
         // Buscar informações do Firestore
         const updateDoc = await getDoc(doc(db, 'config', 'updates'));

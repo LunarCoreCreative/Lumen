@@ -3,40 +3,26 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*'  # Dispara quando você criar uma tag como v0.1.0, v0.2.0, etc.
-  workflow_dispatch: # Permite disparar manualmente
-
-permissions:
-  contents: write  # Necessário para criar releases
+      - 'v*'
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
+          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install Dependencies
+        run: npm ci
 
-      - name: Build Vite
-        run: npm run build
-
-      - name: Build Electron (Windows)
+      - name: Build and Publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:win
-
-      - name: Create Release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "dist-electron/*.exe,dist-electron/*.yml"
-          token: ${{ secrets.GITHUB_TOKEN }}
-          draft: false
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run publish:win

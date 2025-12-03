@@ -2,6 +2,14 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
+    // Regra para configurações públicas (como verificação de updates)
+    match /config/{document} {
+      // Permitir leitura pública apenas para o documento 'updates'
+      allow read: if document == 'updates';
+      // Escrita apenas para administradores (você pode ajustar conforme necessário)
+      allow write: if false;
+    }
+    
     // Regras para a coleção de chats
     match /chats/{chatId} {
       // Permitir leitura/escrita apenas se o usuário for um participante
