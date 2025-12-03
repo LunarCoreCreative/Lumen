@@ -88,28 +88,37 @@ async function main() {
  * Parseia o latest.yml gerado pelo electron-builder
  */
 function parseLatestYml(ymlContent) {
+    console.log('🔍 Conteúdo do latest.yml:');
+    console.log('---');
+    console.log(ymlContent);
+    console.log('---\n');
+
     const lines = ymlContent.split('\n');
     const data = {};
 
     // Extrair versão
-    const versionLine = lines.find(l => l.startsWith('version:'));
+    const versionLine = lines.find(l => l.trim().startsWith('version:'));
     if (versionLine) {
-        data.version = versionLine.split(':')[1].trim();
+        data.version = versionLine.split(':')[1].trim().replace(/['"]/g, '');
     }
 
     // Extrair informações do arquivo (primeira entrada em 'files')
-    const filesIndex = lines.findIndex(l => l.startsWith('files:'));
+    const filesIndex = lines.findIndex(l => l.trim().startsWith('files:'));
     if (filesIndex !== -1) {
         // Procurar por 'url:', 'sha512:', 'size:' após 'files:'
         for (let i = filesIndex + 1; i < lines.length; i++) {
             const line = lines[i].trim();
 
             if (line.startsWith('url:')) {
-                data.fileName = line.split(':')[1].trim();
+                // Remove 'url: ' e qualquer aspas
+                data.fileName = line.substring(4).trim().replace(/['"]/g, '');
             } else if (line.startsWith('sha512:')) {
-                data.sha512 = line.split(':')[1].trim();
+                // Remove 'sha512: ' e qualquer aspas
+                data.sha512 = line.substring(7).trim().replace(/['"]/g, '');
             } else if (line.startsWith('size:')) {
-                data.fileSize = parseInt(line.split(':')[1].trim());
+                // Remove 'size: ' e converte para número
+                const sizeStr = line.substring(5).trim();
+                data.fileSize = parseInt(sizeStr);
             }
 
             // Se encontramos todos os campos, podemos parar
@@ -119,14 +128,29 @@ function parseLatestYml(ymlContent) {
         }
     }
 
+    console.log('📊 Dados extraídos:');
+    console.log('   version:', data.version);
+    console.log('   fileName:', data.fileName);
+    console.log('   sha512:', data.sha512 ? data.sha512.substring(0, 20) + '...' : 'NOT FOUND');
+    console.log('   fileSize:', data.fileSize);
+
     // Construir URL de download do GitHub
     if (data.version && data.fileName) {
         data.downloadUrl = `https://github.com/${GITHUB_REPO}/releases/download/v${data.version}/${data.fileName}`;
     }
 
     // Validar dados extraídos
-    if (!data.version || !data.fileName || !data.sha512 || !data.fileSize) {
-        throw new Error('Falha ao extrair informações do latest.yml. Verifique o formato do arquivo.');
+    if (!data.version) {
+        throw new Error('Versão não encontrada no latest.yml');
+    }
+    if (!data.fileName) {
+        throw new Error('Nome do arquivo não encontrado no latest.yml');
+    }
+    if (!data.sha512) {
+        throw new Error('SHA512 não encontrado no latest.yml');
+    }
+    if (!data.fileSize) {
+        throw new Error('Tamanho do arquivo não encontrado no latest.yml');
     }
 
     return data;
