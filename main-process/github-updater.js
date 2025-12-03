@@ -80,31 +80,17 @@ async function checkForUpdates() {
             log.info('✨ Nova versão disponível!');
 
             if (mainWindow) {
-                const logMessage = `📱 Versão atual: ${currentVersion}\n✅ Nova versão: ${latestVersion}\n\n${updateData.changelog || ''}`;
-
-                const { response } = await dialog.showMessageBox(mainWindow, {
-                    type: 'info',
-                    title: '🎉 Atualização Disponível!',
-                    message: `Nova versão ${latestVersion} disponível!`,
-                    detail: logMessage,
-                    buttons: ['Baixar e Instalar', 'Mais Tarde'],
-                    defaultId: 0,
-                    cancelId: 1
+                // Enviar evento para a UI (UpdateNotification.jsx)
+                mainWindow.webContents.send('update-available', {
+                    version: latestVersion,
+                    changelog: updateData.changelog || ''
                 });
-
-                if (response === 0) {
-                    // Baixar atualização
-                    await downloadUpdate();
-                } else {
-                    isUpdateInProgress = false;
-                }
             }
         } else {
             log.info('App está atualizado');
             if (mainWindow) {
                 mainWindow.webContents.send('update-not-available');
             }
-            isUpdateInProgress = false;
         }
 
     } catch (error) {
@@ -114,6 +100,7 @@ async function checkForUpdates() {
                 message: `Erro ao verificar atualizações: ${error.message}`
             });
         }
+    } finally {
         isUpdateInProgress = false;
     }
 }
@@ -122,10 +109,17 @@ async function checkForUpdates() {
  * Inicia o download da atualização do GitHub Releases
  */
 async function downloadUpdate() {
-    // Nota: isUpdateInProgress já deve ser true aqui se veio do checkForUpdates
-    // Mas por segurança, mantemos ou verificamos. 
-    // Como chamamos diretamente do checkForUpdates, não precisamos setar true de novo, 
-    // mas precisamos garantir que seja false no final (finally).
+    // Se já estiver baixando, não faz nada (ou avisa)
+    // isUpdateInProgress é setado no checkForUpdates, mas se o download for chamado separado,
+    // precisamos garantir que não haja conflito.
+    // Como o fluxo agora é quebrado, o isUpdateInProgress do checkForUpdates já deve ter virado false.
+    // Vamos usar uma nova flag ou reutilizar com cuidado.
+
+    if (isUpdateInProgress) {
+        log.warn('Download já em andamento ou verificação ativa.');
+        return;
+    }
+    isUpdateInProgress = true;
 
     try {
         log.info('📥 Iniciando download da atualização do GitHub...');
@@ -183,28 +177,19 @@ async function downloadUpdate() {
         // Guardar caminho para instalação
         global.updatePath = downloadPath;
 
-        // Perguntar se quer instalar
+        // Avisar UI que o download terminou
         if (mainWindow) {
-            const installResponse = await dialog.showMessageBox(mainWindow, {
-                type: 'info',
-                title: 'Download Concluído',
-                message: 'Atualização baixada!',
-                detail: 'Deseja instalar agora? O app será fechado.',
-                buttons: ['Instalar', 'Depois'],
-                defaultId: 0
+            mainWindow.webContents.send('update-downloaded', {
+                version: updateData.currentVersion,
+                path: downloadPath
             });
-
-            if (installResponse.response === 0) {
-                installUpdate();
-            }
         }
 
     } catch (error) {
         log.error('Erro ao baixar atualização:', error);
 
         if (mainWindow) {
-            dialog.showErrorBox('Erro no Download', `Não foi possível baixar a atualização:\n${error.message}`);
-
+            // Enviar erro para a UI em vez de dialog nativo
             mainWindow.webContents.send('update-error', {
                 message: `Erro ao baixar atualização: ${error.message}`
             });
