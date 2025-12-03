@@ -1,7 +1,7 @@
 {
   "name": "lumen",
   "private": true,
-  "version": "0.1.0-Alpha",
+  "version": "0.1.1-Alpha",
   "main": "main-process/main.js",
   "author": "BCG",
   "description": "Lumen - Plataforma Social",
