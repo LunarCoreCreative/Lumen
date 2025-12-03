@@ -10,7 +10,7 @@
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
-const yaml = require('yaml'); // Vamos usar yaml parser nativo do Node
+
 
 // Firebase config (via environment variables ou arquivo local)
 const FIREBASE_CONFIG = {
