@@ -136,11 +136,27 @@ async function downloadUpdate() {
 
         // Verificar integridade
         log.info('🔐 Verificando integridade do arquivo...');
-        const fileSha512 = await calculateSha512(downloadPath);
+        const fileSha512Hex = await calculateSha512(downloadPath);
 
-        if (fileSha512 !== expectedSha512) {
+        // Converter o hash esperado (que pode estar em Base64) para Hex para comparação
+        let expectedHex = expectedSha512;
+
+        // Se o hash esperado terminar com =, provavelmente é Base64
+        if (expectedSha512.endsWith('=') || expectedSha512.length === 88) {
+            try {
+                expectedHex = Buffer.from(expectedSha512, 'base64').toString('hex');
+                log.info('ℹ️ Hash convertido de Base64 para Hex');
+            } catch (e) {
+                log.warn('Falha ao converter hash de Base64, usando como está.');
+            }
+        }
+
+        log.info(`Hash Arquivo (Hex): ${fileSha512Hex}`);
+        log.info(`Hash Esperado (Hex): ${expectedHex}`);
+
+        if (fileSha512Hex !== expectedHex) {
             fs.unlinkSync(downloadPath); // Remover arquivo corrompido
-            throw new Error('Verificação de integridade falhou! Arquivo corrompido.');
+            throw new Error(`Verificação de integridade falhou!\nHash calculado: ${fileSha512Hex}\nHash esperado: ${expectedHex}`);
         }
 
         log.info('✅ Download concluído e verificado!');
@@ -166,7 +182,10 @@ async function downloadUpdate() {
 
     } catch (error) {
         log.error('Erro ao baixar atualização:', error);
+
         if (mainWindow) {
+            dialog.showErrorBox('Erro no Download', `Não foi possível baixar a atualização:\n${error.message}`);
+
             mainWindow.webContents.send('update-error', {
                 message: `Erro ao baixar atualização: ${error.message}`
             });
@@ -180,6 +199,9 @@ async function downloadUpdate() {
 function installUpdate() {
     if (!global.updatePath || !fs.existsSync(global.updatePath)) {
         log.error('Arquivo de atualização não encontrado');
+        if (mainWindow) {
+            dialog.showErrorBox('Erro na Instalação', 'Arquivo de atualização não encontrado.');
+        }
         return;
     }
 
