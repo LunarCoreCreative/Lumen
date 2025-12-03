@@ -37,9 +37,13 @@ let isUpdateInProgress = false;
 
 /**
  * Verifica se há atualizações disponíveis
+ * @param {Electron.WebContents} sender - WebContents que solicitou a verificação (opcional)
  */
-async function checkForUpdates() {
+async function checkForUpdates(sender = null) {
     if (isUpdateInProgress) return;
+
+    // Determinar qual WebContents usar para responder
+    const targetSender = sender || (mainWindow ? mainWindow.webContents : null);
 
     // Não verificar em desenvolvimento
     if (process.env.NODE_ENV === 'development') {
@@ -61,8 +65,8 @@ async function checkForUpdates() {
 
         if (!updateDoc.exists()) {
             log.info('Nenhuma informação de update encontrada no Firestore');
-            if (mainWindow) {
-                mainWindow.webContents.send('update-not-available');
+            if (targetSender) {
+                targetSender.send('update-not-available');
             }
             isUpdateInProgress = false;
             return;
@@ -79,24 +83,24 @@ async function checkForUpdates() {
         if (compareVersions(latestVersion, currentVersion) > 0) {
             log.info('✨ Nova versão disponível!');
 
-            if (mainWindow) {
+            if (targetSender) {
                 // Enviar evento para a UI (UpdateNotification.jsx)
-                mainWindow.webContents.send('update-available', {
+                targetSender.send('update-available', {
                     version: latestVersion,
                     changelog: updateData.changelog || ''
                 });
             }
         } else {
             log.info('App está atualizado');
-            if (mainWindow) {
-                mainWindow.webContents.send('update-not-available');
+            if (targetSender) {
+                targetSender.send('update-not-available');
             }
         }
 
     } catch (error) {
         log.error('Erro ao verificar atualizações:', error);
-        if (mainWindow) {
-            mainWindow.webContents.send('update-error', {
+        if (targetSender) {
+            targetSender.send('update-error', {
                 message: `Erro ao verificar atualizações: ${error.message}`
             });
         }
@@ -107,8 +111,11 @@ async function checkForUpdates() {
 
 /**
  * Inicia o download da atualização do GitHub Releases
+ * @param {Electron.WebContents} sender - WebContents que solicitou o download (opcional)
  */
-async function downloadUpdate() {
+async function downloadUpdate(sender = null) {
+    const targetSender = sender || (mainWindow ? mainWindow.webContents : null);
+
     // Se já estiver baixando, não faz nada (ou avisa)
     // isUpdateInProgress é setado no checkForUpdates, mas se o download for chamado separado,
     // precisamos garantir que não haja conflito.
@@ -145,7 +152,7 @@ async function downloadUpdate() {
         const downloadPath = path.join(tempDir, fileName);
 
         // Fazer download
-        await downloadFile(downloadUrl, downloadPath, totalSize);
+        await downloadFile(downloadUrl, downloadPath, totalSize, targetSender);
 
         // Verificar integridade
         log.info('🔐 Verificando integridade do arquivo...');
@@ -178,8 +185,8 @@ async function downloadUpdate() {
         global.updatePath = downloadPath;
 
         // Avisar UI que o download terminou
-        if (mainWindow) {
-            mainWindow.webContents.send('update-downloaded', {
+        if (targetSender) {
+            targetSender.send('update-downloaded', {
                 version: updateData.currentVersion,
                 path: downloadPath
             });
@@ -188,9 +195,9 @@ async function downloadUpdate() {
     } catch (error) {
         log.error('Erro ao baixar atualização:', error);
 
-        if (mainWindow) {
+        if (targetSender) {
             // Enviar erro para a UI em vez de dialog nativo
-            mainWindow.webContents.send('update-error', {
+            targetSender.send('update-error', {
                 message: `Erro ao baixar atualização: ${error.message}`
             });
         }
@@ -201,11 +208,15 @@ async function downloadUpdate() {
 
 /**
  * Instala a atualização e reinicia o app
+ * @param {Electron.WebContents} sender - WebContents que solicitou a instalação (opcional)
  */
-function installUpdate() {
+function installUpdate(sender = null) {
+    const targetSender = sender || (mainWindow ? mainWindow.webContents : null);
+    const targetWindow = targetSender ? require('electron').BrowserWindow.fromWebContents(targetSender) : mainWindow;
+
     if (!global.updatePath || !fs.existsSync(global.updatePath)) {
         log.error('Arquivo de atualização não encontrado');
-        if (mainWindow) {
+        if (targetWindow) {
             dialog.showErrorBox('Erro na Instalação', 'Arquivo de atualização não encontrado.');
         }
         return;
@@ -214,8 +225,8 @@ function installUpdate() {
     log.info('🚀 Instalando atualização...');
 
     // Avisar o usuário
-    if (mainWindow) {
-        dialog.showMessageBoxSync(mainWindow, {
+    if (targetWindow) {
+        dialog.showMessageBoxSync(targetWindow, {
             type: 'info',
             title: 'Instalando',
             message: 'O aplicativo será fechado para iniciar a instalação.',
@@ -240,7 +251,7 @@ function installUpdate() {
 /**
  * Faz download de um arquivo com progresso
  */
-function downloadFile(url, dest, totalSize) {
+function downloadFile(url, dest, totalSize, targetSender = null) {
     return new Promise((resolve, reject) => {
         const file = fs.createWriteStream(dest);
         let downloadedSize = 0;
@@ -264,8 +275,8 @@ function downloadFile(url, dest, totalSize) {
                     downloadedSize += chunk.length;
                     const percent = totalSize ? (downloadedSize / totalSize) * 100 : 0;
 
-                    if (mainWindow) {
-                        mainWindow.webContents.send('download-progress', {
+                    if (targetSender) {
+                        targetSender.send('download-progress', {
                             percent: percent,
                             transferred: downloadedSize,
                             total: totalSize

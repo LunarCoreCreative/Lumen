@@ -66,16 +66,16 @@ ipcMain.on('close-window', (event) => {
 });
 
 // Handlers de autoupdate
-ipcMain.on('check-for-updates', () => {
-    updater.checkForUpdates();
+ipcMain.on('check-for-updates', (event) => {
+    updater.checkForUpdates(event.sender);
 });
 
-ipcMain.on('download-update', () => {
-    updater.downloadUpdate();
+ipcMain.on('download-update', (event) => {
+    updater.downloadUpdate(event.sender);
 });
 
-ipcMain.on('install-update', () => {
-    updater.installUpdate();
+ipcMain.on('install-update', (event) => {
+    updater.installUpdate(event.sender);
 });
 
 
