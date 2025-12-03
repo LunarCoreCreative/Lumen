@@ -5,6 +5,7 @@ directories:
 files:
   - dist/**/*
   - main-process/**/*
+  - preload.js
 win:
   forceCodeSigning: false  # Desabilita assinatura de código (evita problemas de permissão)
   target:
