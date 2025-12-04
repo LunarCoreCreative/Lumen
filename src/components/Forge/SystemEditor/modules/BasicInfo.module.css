@@ -1,0 +1,423 @@
+/* === BASIC INFO MODULE - ULTRA PREMIUM === */
+
+.basicInfo {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.moduleHeader {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid rgba(139, 92, 246, 0.2);
+}
+
+.headerIcon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+}
+
+.moduleTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 0.5rem;
+}
+
+.moduleSubtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+}
+
+.formSections {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.section {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s;
+}
+
+.section:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.sectionLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 1.5rem;
+}
+
+.sectionLabel svg {
+    color: #8b5cf6;
+}
+
+.badge {
+    margin-left: auto;
+    padding: 0.35rem 0.8rem;
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #a78bfa;
+}
+
+.hint {
+    margin-left: auto;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.4);
+    font-style: italic;
+}
+
+/* Name and Icon Row */
+.nameIconRow {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.iconSelector {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.iconDisplay {
+    width: 80px;
+    height: 80px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    transition: all 0.3s;
+}
+
+.iconDisplay:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+.iconOptions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+}
+
+.iconOption {
+    width: 100%;
+    aspect-ratio: 1;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.iconOption:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(1.1);
+}
+
+.iconOption.active {
+    background: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.6);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+/* Input Group */
+.inputGroup {
+    flex: 1;
+    position: relative;
+}
+
+.input,
+.textarea {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.input:focus,
+.textarea:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.inputCounter,
+.textareaCounter {
+    position: absolute;
+    bottom: -1.5rem;
+    right: 0;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.textareaCounter {
+    position: static;
+    display: block;
+    text-align: right;
+    margin-top: 0.5rem;
+}
+
+/* Genre Grid */
+.genreGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.genreCard {
+    padding: 1.25rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.genreCard:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-5px);
+}
+
+.genreCard.selected {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+}
+
+.genreIcon {
+    font-size: 2rem;
+}
+
+.genreLabel {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Complexity Options */
+.complexityOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.complexityCard {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.complexityCard:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.complexityCard.selected {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+.radioInput {
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.radioInput:checked {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.2);
+}
+
+.radioInput:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: #3b82f6;
+    border-radius: 50%;
+}
+
+.complexityContent {
+    flex: 1;
+}
+
+.complexityLabel {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0.25rem;
+}
+
+.complexityDesc {
+    display: block;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Tags */
+.tagsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    min-height: 60px;
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    border-radius: 20px;
+    color: #a78bfa;
+    font-size: 0.9rem;
+    font-weight: 600;
+    animation: tagPopIn 0.3s ease-out;
+}
+
+@keyframes tagPopIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.tagRemove {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.tagRemove:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.2);
+}
+
+.tagInput {
+    flex: 1;
+    min-width: 200px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.tagInput::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .nameIconRow {
+        flex-direction: column;
+    }
+
+    .iconOptions {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .genreGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

@@ -1,0 +1,119 @@
+.container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0f0f0f;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    font-family: 'Inter', sans-serif;
+}
+
+.content {
+    background: #1a1a1a;
+    padding: 3rem;
+    border-radius: 24px;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 50px rgba(239, 68, 68, 0.1);
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.iconWrapper {
+    background: rgba(239, 68, 68, 0.1);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.title {
+    color: #ef4444;
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 0 1rem;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+}
+
+.subtitle {
+    color: #e5e5e5;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.reasonBox {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.reasonLabel {
+    display: block;
+    color: #ef4444;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.reasonText {
+    color: #fff;
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 2rem;
+}
+
+.footer p {
+    color: #888;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+.button {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.875rem 2rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.button:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

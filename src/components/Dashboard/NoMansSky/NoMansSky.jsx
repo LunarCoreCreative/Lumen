@@ -30,13 +30,13 @@ export function NoMansSky({ user, onBack, customRecipes = [], onAddRecipe, onDel
                 game={gameData}
                 user={user}
                 onBack={onBack}
-                showAddButton={user?.isAdmin || user?.isNMSDev}
+                showAddButton={user?.isOwner || user?.isAdmin || user?.isNMSDev}
                 onAddContent={handleAddContent}
             >
                 <RecipeList
                     customRecipes={customRecipes}
                     onDeleteRecipe={onDeleteRecipe}
-                    isAdmin={user?.isAdmin || user?.isNMSDev}
+                    isAdmin={user?.isOwner || user?.isAdmin || user?.isNMSDev}
                 />
             </GameView>
 

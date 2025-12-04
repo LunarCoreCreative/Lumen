@@ -2,6 +2,11 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const updater = require('./github-updater');
 
+// Configurar o App User Model ID para Windows (melhora notificações e taskbar)
+if (process.platform === 'win32') {
+    app.setAppUserModelId('com.bcg.lumen');
+}
+
 // ... (rest of the file remains the same until app.whenReady)
 
 app.whenReady().then(async () => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './OwnerPanel.module.css';
-import { Crown, Users, Shield, BarChart3, Settings as SettingsIcon } from 'lucide-react';
+import { Crown, Users, Shield, BarChart3, Settings as SettingsIcon, Globe } from 'lucide-react';
 
 export function OwnerPanel({ user }) {
     const [activeTab, setActiveTab] = useState('admins');
@@ -8,6 +8,7 @@ export function OwnerPanel({ user }) {
     const tabs = [
         { id: 'admins', icon: Shield, label: 'Gerenciar Admins' },
         { id: 'users', icon: Users, label: 'Usuários' },
+        { id: 'ips', icon: Globe, label: 'IPs Banidos' },
         { id: 'stats', icon: BarChart3, label: 'Estatísticas' },
         { id: 'settings', icon: SettingsIcon, label: 'Config. Globais' }
     ];
@@ -52,6 +53,7 @@ export function OwnerPanel({ user }) {
             <div className={styles.content}>
                 {activeTab === 'admins' && <AdminManager user={user} />}
                 {activeTab === 'users' && <UserManager user={user} />}
+                {activeTab === 'ips' && <IpManager user={user} />}
                 {activeTab === 'stats' && <SystemStats />}
                 {activeTab === 'settings' && <GlobalSettings />}
             </div>
@@ -76,7 +78,6 @@ function AdminManager({ user }) {
         try {
             const { getAdminCodes } = await import('../../utils/adminCodes');
             const allCodes = await getAdminCodes(user.uid);
-            // Ordenar por data de criação (mais recente primeiro)
             allCodes.sort((a, b) => {
                 const dateA = a.createdAt?.toDate?.() || new Date(0);
                 const dateB = b.createdAt?.toDate?.() || new Date(0);
@@ -327,6 +328,12 @@ function UserManager({ user }) {
     const [actionLoading, setActionLoading] = useState(null);
     const [message, setMessage] = useState(null);
 
+    // State for Ban Modal
+    const [banModalOpen, setBanModalOpen] = useState(false);
+    const [selectedUserToBan, setSelectedUserToBan] = useState(null);
+    const [banReason, setBanReason] = useState('');
+    const [banIpOption, setBanIpOption] = useState(false);
+
     useEffect(() => {
         loadUsers();
     }, [filter]);
@@ -351,19 +358,33 @@ function UserManager({ user }) {
         }
     };
 
-    const handleBanUser = async (userId, userName) => {
-        const reason = prompt(`Motivo do ban de ${userName}:`, 'Violação dos termos de uso');
-        if (!reason) return;
+    const openBanModal = (user) => {
+        setSelectedUserToBan(user);
+        setBanReason('Violação dos termos de uso');
+        setBanIpOption(false);
+        setBanModalOpen(true);
+    };
 
-        setActionLoading(userId);
+    const closeBanModal = () => {
+        setBanModalOpen(false);
+        setSelectedUserToBan(null);
+        setBanReason('');
+    };
+
+    const confirmBanUser = async () => {
+        if (!selectedUserToBan) return;
+
+        setActionLoading(selectedUserToBan.id);
+        closeBanModal();
+
         try {
             const { banUser } = await import('../../utils/ownerUtils');
-            await banUser(userId, user.uid, reason);
-            setMessage({ type: 'success', text: `${userName} foi banido com sucesso.` });
+            await banUser(selectedUserToBan.id, user.uid, banReason, banIpOption);
+            setMessage({ type: 'success', text: `${selectedUserToBan.displayName} foi banido com sucesso.${banIpOption ? ' (IP também banido)' : ''}` });
             await loadUsers();
         } catch (error) {
             console.error('Erro ao banir usuário:', error);
-            setMessage({ type: 'error', text: 'Erro ao banir usuário.' });
+            setMessage({ type: 'error', text: 'Erro ao banir usuário: ' + error.message });
         } finally {
             setActionLoading(null);
         }
@@ -483,6 +504,102 @@ function UserManager({ user }) {
                 </div>
             )}
 
+            {/* Ban Modal */}
+            {banModalOpen && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 9999
+                }}>
+                    <div style={{
+                        backgroundColor: '#1a1a1a',
+                        padding: '2rem',
+                        borderRadius: '16px',
+                        width: '90%',
+                        maxWidth: '500px',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
+                    }}>
+                        <h3 style={{ marginTop: 0, color: '#fff', fontSize: '1.5rem' }}>Banir Usuário</h3>
+                        <p style={{ color: '#ccc', marginBottom: '1.5rem' }}>
+                            Você está prestes a banir <strong>{selectedUserToBan?.displayName}</strong>.
+                        </p>
+
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', color: '#fff', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Motivo do Banimento</label>
+                            <input
+                                type="text"
+                                value={banReason}
+                                onChange={(e) => setBanReason(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                                    color: '#fff',
+                                    outline: 'none'
+                                }}
+                            />
+                        </div>
+
+                        <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <input
+                                type="checkbox"
+                                id="banIpCheckbox"
+                                checked={banIpOption}
+                                onChange={(e) => setBanIpOption(e.target.checked)}
+                                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                            />
+                            <label htmlFor="banIpCheckbox" style={{ color: '#fff', cursor: 'pointer', userSelect: 'none' }}>
+                                Banir também o endereço IP?
+                                <span style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginTop: '0.2rem' }}>
+                                    Isso impedirá o acesso de qualquer conta nesta rede.
+                                </span>
+                            </label>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                            <button
+                                onClick={closeBanModal}
+                                style={{
+                                    padding: '0.75rem 1.5rem',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                                    backgroundColor: 'transparent',
+                                    color: '#fff',
+                                    cursor: 'pointer',
+                                    fontWeight: 600
+                                }}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={confirmBanUser}
+                                style={{
+                                    padding: '0.75rem 1.5rem',
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    backgroundColor: '#f44336',
+                                    color: '#fff',
+                                    cursor: 'pointer',
+                                    fontWeight: 600
+                                }}
+                            >
+                                Confirmar Banimento
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Filters */}
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
                 <input
@@ -599,7 +716,10 @@ function UserManager({ user }) {
                                         </button>
                                     ) : (
                                         <button
-                                            onClick={() => handleBanUser(u.id, u.displayName)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openBanModal(u);
+                                            }}
                                             disabled={actionLoading === u.id}
                                             style={{
                                                 padding: '0.5rem 1rem',
@@ -691,6 +811,144 @@ function UserManager({ user }) {
                                     )}
                                 </div>
                             )}
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+// IP Manager Component
+function IpManager({ user }) {
+    const [ips, setIps] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [message, setMessage] = useState(null);
+
+    useEffect(() => {
+        loadIps();
+    }, []);
+
+    const loadIps = async () => {
+        setLoading(true);
+        try {
+            const { getBannedIps } = await import('../../utils/ownerUtils');
+            const bannedIps = await getBannedIps();
+            setIps(bannedIps);
+        } catch (error) {
+            console.error('Erro ao carregar IPs:', error);
+            setMessage({ type: 'error', text: 'Erro ao carregar IPs banidos.' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUnbanIp = async (ipId, ipAddress) => {
+        if (!window.confirm(`Desbanir o IP ${ipAddress}?`)) return;
+
+        try {
+            const { unbanIp } = await import('../../utils/ownerUtils');
+            await unbanIp(ipId, user.uid);
+            setMessage({ type: 'success', text: `IP ${ipAddress} desbanido com sucesso.` });
+            await loadIps();
+        } catch (error) {
+            console.error('Erro ao desbanir IP:', error);
+            setMessage({ type: 'error', text: 'Erro ao desbanir IP.' });
+        }
+    };
+
+    return (
+        <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>Gerenciamento de IPs Banidos</h2>
+            <p className={styles.sectionDescription}>
+                Visualize e remova bloqueios de IP.
+            </p>
+
+            {message && (
+                <div style={{
+                    marginBottom: '1.5rem',
+                    padding: '1rem',
+                    borderRadius: '12px',
+                    background: message.type === 'success' ? 'rgba(76, 175, 80, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    border: `1px solid ${message.type === 'success' ? 'rgba(76, 175, 80, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                    color: message.type === 'success' ? '#4caf50' : '#ef4444',
+                    fontSize: '0.95rem',
+                    fontWeight: 500
+                }}>
+                    {message.text}
+                </div>
+            )}
+
+            {loading ? (
+                <div className={styles.placeholder}>
+                    <p>Carregando IPs...</p>
+                </div>
+            ) : ips.length === 0 ? (
+                <div className={styles.placeholder}>
+                    <Globe size={48} />
+                    <p>Nenhum IP banido encontrado.</p>
+                </div>
+            ) : (
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                    {ips.map(ip => (
+                        <div
+                            key={ip.id}
+                            style={{
+                                padding: '1.25rem',
+                                borderRadius: '12px',
+                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                background: 'rgba(255, 255, 255, 0.03)',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+                                    <code style={{
+                                        fontSize: '1.1rem',
+                                        fontWeight: 600,
+                                        color: '#fff',
+                                        background: 'rgba(255, 255, 255, 0.1)',
+                                        padding: '0.5rem 1rem',
+                                        borderRadius: '8px',
+                                        fontFamily: 'monospace'
+                                    }}>
+                                        {ip.ip}
+                                    </code>
+                                    <span style={{
+                                        padding: '0.35rem 0.75rem',
+                                        borderRadius: '6px',
+                                        fontSize: '0.8rem',
+                                        fontWeight: 600,
+                                        background: 'rgba(244, 67, 54, 0.2)',
+                                        color: '#f44336',
+                                        border: '1px solid rgba(244, 67, 54, 0.4)'
+                                    }}>
+                                        BANIDO
+                                    </span>
+                                </div>
+                                <div style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.5)' }}>
+                                    <div>Motivo: {ip.reason}</div>
+                                    <div style={{ fontSize: '0.8rem', marginTop: '0.25rem', opacity: 0.7 }}>
+                                        Banido em: {ip.bannedAt?.toDate?.().toLocaleString('pt-BR') || 'N/A'}
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => handleUnbanIp(ip.id, ip.ip)}
+                                style={{
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(76, 175, 80, 0.3)',
+                                    background: 'rgba(76, 175, 80, 0.1)',
+                                    color: '#4caf50',
+                                    cursor: 'pointer',
+                                    fontSize: '0.875rem'
+                                }}
+                            >
+                                Desbanir IP
+                            </button>
                         </div>
                     ))}
                 </div>

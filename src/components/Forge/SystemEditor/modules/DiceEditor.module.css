@@ -1,0 +1,239 @@
+/* === DICE EDITOR - ULTRA PREMIUM === */
+
+.diceEditor {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.moduleHeader {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid rgba(139, 92, 246, 0.2);
+}
+
+.headerIcon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #10b981, #34d399);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+}
+
+.moduleTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 0.5rem;
+}
+
+.moduleSubtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+}
+
+.section {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.sectionTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 0.5rem;
+}
+
+.sectionDesc {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 2rem;
+}
+
+/* Dice Grid */
+.diceGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem;
+}
+
+.diceCard {
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+.diceCard:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.diceCard.active {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--dice-color);
+    box-shadow: 0 0 30px var(--dice-color);
+}
+
+.diceCard.primary {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.1));
+    border-color: #10b981;
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.4);
+}
+
+.diceIcon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 10px var(--dice-color));
+}
+
+.diceName {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dice-color);
+    margin-bottom: 0.5rem;
+}
+
+.diceSides {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 1rem;
+}
+
+.diceActions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.primaryBtn,
+.removeBtn {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.primaryBtn {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #10b981;
+}
+
+.primaryBtn.selected {
+    background: rgba(16, 185, 129, 0.3);
+    border-color: #10b981;
+    color: #fff;
+}
+
+.primaryBtn:hover {
+    background: rgba(16, 185, 129, 0.2);
+}
+
+.removeBtn {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.removeBtn:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+.addOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(167, 139, 250, 0.05));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+    color: #a78bfa;
+    font-weight: 600;
+}
+
+.diceCard:hover .addOverlay {
+    opacity: 1;
+}
+
+/* Summary */
+.summary {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.05));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-around;
+    gap: 2rem;
+}
+
+.summaryItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.summaryLabel {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.summaryValue {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #10b981;
+}
+
+@media (max-width: 768px) {
+    .diceGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .summary {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

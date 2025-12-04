@@ -37,7 +37,8 @@ export function Settings({ user, onLogout }) {
                         likes: true,
                         comments: true,
                         messages: true,
-                        mentions: true
+                        mentions: true,
+                        native: true // Notificações nativas do Windows
                     },
                     privacy: {
                         whoCanSeePosts: 'public',
@@ -85,6 +86,7 @@ export function Settings({ user, onLogout }) {
 
     const tabs = [
         { id: 'profile', icon: User, label: 'Perfil' },
+        { id: 'notifications', icon: Bell, label: 'Notificações' },
         { id: 'privacy', icon: Lock, label: 'Privacidade' },
         { id: 'account', icon: Shield, label: 'Conta' },
         { id: 'about', icon: Info, label: 'Sobre' },
@@ -130,6 +132,12 @@ export function Settings({ user, onLogout }) {
                 {/* Main Content */}
                 <div className={styles.main}>
                     {activeTab === 'profile' && <ProfileSettings user={user} />}
+                    {activeTab === 'notifications' && (
+                        <NotificationSettings
+                            settings={settings}
+                            onUpdate={updateSettings}
+                        />
+                    )}
                     {activeTab === 'privacy' && (
                         <PrivacySettings
                             settings={settings}
@@ -321,6 +329,23 @@ function NotificationSettings({ settings, onUpdate }) {
                             type="checkbox"
                             checked={settings?.notifications?.mentions || false}
                             onChange={() => handleToggle('mentions')}
+                        />
+                        <span className={styles.slider}></span>
+                    </label>
+                </div>
+            </div>
+
+            <div className={styles.settingGroup} style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                <div className={styles.switchRow}>
+                    <div>
+                        <div className={styles.switchLabel}>🔔 Notificações Nativas do Windows</div>
+                        <div className={styles.switchDescription}>Receba notificações na área de trabalho quando chegar uma nova mensagem</div>
+                    </div>
+                    <label className={styles.switch}>
+                        <input
+                            type="checkbox"
+                            checked={settings?.notifications?.native !== false}
+                            onChange={() => handleToggle('native')}
                         />
                         <span className={styles.slider}></span>
                     </label>

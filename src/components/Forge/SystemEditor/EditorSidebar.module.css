@@ -1,0 +1,205 @@
+/* === EDITOR SIDEBAR - STEPS NAVIGATION === */
+
+.editorSidebar {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.sidebarHeader {
+    padding: 2rem 1.5rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebarHeader h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 0.5rem;
+}
+
+.progress {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.progress span:first-child {
+    color: #8b5cf6;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.separator {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Steps Navigation */
+.stepsNav {
+    flex: 1;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stepItem {
+    display: grid;
+    grid-template-columns: 32px 40px 1fr 4px;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+}
+
+.stepItem:hover:not(.locked) {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--step-color, rgba(255, 255, 255, 0.15));
+    transform: translateX(5px);
+}
+
+.stepItem.active {
+    background: linear-gradient(90deg, rgba(139, 92, 246, 0.15), rgba(139, 92, 246, 0.05));
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+}
+
+.stepItem.locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.stepNumber {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s;
+}
+
+.stepItem.active .stepNumber {
+    background: var(--step-color);
+    color: #fff;
+}
+
+.checkIcon {
+    color: #10b981;
+}
+
+.stepIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--step-color);
+    transition: all 0.3s;
+}
+
+.stepItem:hover:not(.locked) .stepIcon {
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(1.1);
+}
+
+.stepItem.active .stepIcon {
+    background: var(--step-color);
+    color: #fff;
+    box-shadow: 0 0 15px var(--step-color);
+}
+
+.stepContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.stepLabel {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.stepBadge {
+    font-size: 0.7rem;
+    color: rgba(255, 191, 36, 0.9);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stepIndicator {
+    width: 4px;
+    height: 100%;
+    background: transparent;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+
+.stepItem.active .stepIndicator {
+    background: var(--step-color);
+    box-shadow: 0 0 10px var(--step-color);
+}
+
+/* Sidebar Footer */
+.sidebarFooter {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tipCard {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    gap: 0.75rem;
+}
+
+.tipIcon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.tipText {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Scrollbar */
+.editorSidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.editorSidebar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.editorSidebar::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.5);
+    border-radius: 4px;
+}
+
+.editorSidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.7);
+}

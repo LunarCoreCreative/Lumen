@@ -1,4 +1,4 @@
-import { collection, query, getDocs, doc, updateDoc, where, orderBy, limit, serverTimestamp } from 'firebase/firestore';
+import { collection, query, getDocs, doc, updateDoc, where, orderBy, limit, serverTimestamp, getDoc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
 /**
@@ -56,9 +56,11 @@ export async function getAllUsers(filters = {}) {
  * @param {string} userId - ID do usuário a ser banido
  * @param {string} ownerId - ID do owner que está banindo
  * @param {string} reason - Motivo do ban
+ * @param {boolean} banIp - Se deve banir também o IP
  */
-export async function banUser(userId, ownerId, reason = 'Violação dos termos de uso') {
+export async function banUser(userId, ownerId, reason = 'Violação dos termos de uso', banIp = false) {
     try {
+        // 1. Banir a conta (UID)
         await updateDoc(doc(db, 'users', userId), {
             isBanned: true,
             bannedAt: serverTimestamp(),
@@ -66,9 +68,27 @@ export async function banUser(userId, ownerId, reason = 'Violação dos termos d
             bannedReason: reason
         });
 
+        // 2. Banir o IP (se solicitado)
+        if (banIp) {
+            // Buscar o IP do usuário
+            const userDoc = await getDoc(doc(db, 'users', userId));
+            const userIp = userDoc.data()?.lastIp;
+
+            if (userIp) {
+                // Adicionar à coleção de IPs banidos
+                await addDoc(collection(db, 'banned_ips'), {
+                    ip: userIp,
+                    bannedAt: serverTimestamp(),
+                    bannedBy: ownerId,
+                    reason: reason,
+                    originalUser: userId
+                });
+            }
+        }
+
         // Log de moderação
         await addModerationLog({
-            action: 'ban',
+            action: banIp ? 'ban_ip_account' : 'ban_account',
             performedBy: ownerId,
             targetUser: userId,
             reason: reason
@@ -77,6 +97,64 @@ export async function banUser(userId, ownerId, reason = 'Violação dos termos d
         return { success: true };
     } catch (error) {
         console.error('Erro ao banir usuário:', error);
+        throw error;
+    }
+}
+
+/**
+ * Verifica se um IP está banido
+ * @param {string} ip - IP a ser verificado
+ * @returns {Promise<boolean>} True se banido
+ */
+export async function checkIpBan(ip) {
+    try {
+        const q = query(collection(db, 'banned_ips'), where('ip', '==', ip));
+        const snapshot = await getDocs(q);
+        return !snapshot.empty;
+    } catch (error) {
+        console.error('Erro ao verificar IP banido:', error);
+        return false;
+    }
+}
+
+/**
+ * Busca lista de IPs banidos
+ * @returns {Promise<Array>} Lista de IPs banidos
+ */
+export async function getBannedIps() {
+    try {
+        // Removido orderBy temporariamente para evitar erro de índice
+        const q = query(collection(db, 'banned_ips'));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+    } catch (error) {
+        console.error('Erro ao buscar IPs banidos:', error);
+        throw error;
+    }
+}
+
+/**
+ * Desbane um IP
+ * @param {string} ipId - ID do documento do IP banido
+ * @param {string} ownerId - ID do owner que está desbanindo
+ */
+export async function unbanIp(ipId, ownerId) {
+    try {
+        await deleteDoc(doc(db, 'banned_ips', ipId));
+
+        // Log de moderação
+        await addModerationLog({
+            action: 'unban_ip',
+            performedBy: ownerId,
+            targetIpId: ipId
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error('Erro ao desbanir IP:', error);
         throw error;
     }
 }
@@ -222,12 +300,11 @@ export async function removeNMSDev(userId, ownerId) {
 
 /**
  * Adiciona um log de moderação
-
  * @param {Object} logData - Dados do log
  */
 async function addModerationLog(logData) {
     try {
-        await collection(db, 'moderationLogs').add({
+        await addDoc(collection(db, 'moderationLogs'), {
             ...logData,
             timestamp: serverTimestamp()
         });

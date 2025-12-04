@@ -33,7 +33,7 @@ const UpdateNotification = () => {
 
         window.electronAPI.onUpdateError((error) => {
             setUpdateState('error');
-            setError(error.message);
+            setError(error?.message || 'Erro desconhecido ao verificar atualizações');
         });
 
         window.electronAPI.checkForUpdates();

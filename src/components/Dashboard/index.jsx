@@ -18,6 +18,8 @@ import { Settings } from './Settings';
 import { GamingHub } from './GamingHub';
 import { OwnerPanel } from './OwnerPanel';
 import { SearchResults } from './SearchResults';
+import { ForgeHub } from '../Forge';
+
 
 // Componentes Externos
 import { ChatView } from '../Chat/ChatView';
@@ -182,6 +184,8 @@ export function Dashboard({ user }) {
                 return <NewsFeed user={user} />;
             case 'hub':
                 return <GamingHub user={user} />;
+            case 'forge':
+                return <ForgeHub user={user} />;
             case 'owner':
                 return <OwnerPanel user={user} />;
             case 'chat':
@@ -240,7 +244,7 @@ export function Dashboard({ user }) {
                 }
                 content={renderContent()}
                 rightSidebar={
-                    currentView !== 'chat' ? (
+                    currentView !== 'chat' && currentView !== 'forge' ? (
                         <FriendsSidebar
                             user={user}
                             onUserClick={handleViewProfile}
