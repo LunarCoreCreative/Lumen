@@ -3,14 +3,16 @@ import styles from './SkillsEditor.module.css';
 import { Zap, Plus, Search, Filter, Eye, Edit, Copy, Trash2, BookOpen, Settings } from 'lucide-react';
 import { getAllEffects } from '../data/EffectsLibrary';
 import { SkillBuilderModal } from './SkillBuilderModal';
+import { ConfirmDialog } from '../../../ConfirmDialog/ConfirmDialog';
 
-export function SkillsEditor({ data = [], onChange, rulesConfig = {}, onRulesChange }) {
+export function SkillsEditor({ data = [], onChange, rulesConfig = {}, onRulesChange, attributes = [], dice = {}, progression = {} }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('all');
     const [previewMode, setPreviewMode] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [rulesModalOpen, setRulesModalOpen] = useState(false);
     const [editingSkill, setEditingSkill] = useState(null);
+    const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
 
     const handleAddSkill = () => {
         setEditingSkill(null);
@@ -23,8 +25,15 @@ export function SkillsEditor({ data = [], onChange, rulesConfig = {}, onRulesCha
     };
 
     const handleDeleteSkill = (skillId) => {
-        if (!window.confirm('Tem certeza que deseja deletar esta habilidade?')) return;
-        onChange(data.filter(skill => skill.id !== skillId));
+        setConfirmDialog({
+            isOpen: true,
+            title: 'Deletar Habilidade',
+            message: 'Tem certeza que deseja deletar esta habilidade?',
+            onConfirm: () => {
+                onChange(data.filter(skill => skill.id !== skillId));
+                setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: null });
+            }
+        });
     };
 
     const handleDuplicateSkill = (skill) => {
@@ -272,6 +281,9 @@ export function SkillsEditor({ data = [], onChange, rulesConfig = {}, onRulesCha
                         setModalOpen(false);
                         setEditingSkill(null);
                     }}
+                    systemAttributes={attributes}
+                    systemDice={dice}
+                    systemProgression={progression}
                 />
             )}
 
@@ -286,6 +298,15 @@ export function SkillsEditor({ data = [], onChange, rulesConfig = {}, onRulesCha
                     onClose={() => setRulesModalOpen(false)}
                 />
             )}
+
+            {/* Diálogo de Confirmação */}
+            <ConfirmDialog
+                isOpen={confirmDialog.isOpen}
+                title={confirmDialog.title}
+                message={confirmDialog.message}
+                onConfirm={confirmDialog.onConfirm}
+                onCancel={() => setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: null })}
+            />
         </div>
     );
 }

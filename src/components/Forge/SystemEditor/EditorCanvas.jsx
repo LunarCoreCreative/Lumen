@@ -4,6 +4,9 @@ import { BasicInfo } from './modules/BasicInfo';
 import { AttributesEditor } from './modules/AttributesEditor';
 import { DiceEditor } from './modules/DiceEditor';
 import { SkillsEditor } from './modules/SkillsEditor';
+import { ProgressionEditor } from './modules/ProgressionEditor';
+import { CombatEditor } from './modules/CombatEditor';
+import { EquipmentEditor } from './modules/EquipmentEditor';
 // import { AttributesEditor } from './modules/AttributesEditor';
 // import { DiceEditor } from './modules/DiceEditor';
 
@@ -38,14 +41,37 @@ export function EditorCanvas({ currentStep, systemData, onDataChange }) {
                         onChange={(data) => onDataChange('skills', data)}
                         rulesConfig={systemData.skillsRules || {}}
                         onRulesChange={(config) => onDataChange('skillsRules', config)}
+                        attributes={systemData.attributes || []}
+                        dice={systemData.dice || {}}
+                        progression={systemData.progression || {}}
                     />
                 );
             case 4:
-                return <div className={styles.placeholder}>Módulo de Progressão (Em breve)</div>;
+                return (
+                    <ProgressionEditor
+                        data={systemData.progression}
+                        onChange={(data) => onDataChange('progression', data)}
+                        attributes={systemData.attributes}
+                    />
+                );
             case 5:
-                return <div className={styles.placeholder}>Módulo de Combate (Em breve)</div>;
+                return (
+                    <CombatEditor
+                        data={systemData.combat}
+                        onChange={(data) => onDataChange('combat', data)}
+                        attributes={systemData.attributes}
+                        dice={systemData.dice}
+                    />
+                );
             case 6:
-                return <div className={styles.placeholder}>Seções Customizadas (Em breve)</div>;
+                return (
+                    <EquipmentEditor
+                        data={systemData.equipment || {}}
+                        onChange={(data) => onDataChange('equipment', data)}
+                        attributes={systemData.attributes || []}
+                        dice={systemData.dice || {}}
+                    />
+                );
             default:
                 return <div className={styles.placeholder}>Selecione um módulo</div>;
         }

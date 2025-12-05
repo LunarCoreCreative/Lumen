@@ -4,12 +4,14 @@ import { Plus, BookOpen, Crown, TrendingUp, Users, Search, Filter, Download, Sha
 import { SystemEditor } from './SystemEditor/SystemEditor';
 import { db } from '../../firebase';
 import { collection, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog';
 
 export function MastersArea({ user, onBack }) {
     const [view, setView] = useState('list'); // 'list' | 'editor' | 'community'
     const [editingSystem, setEditingSystem] = useState(null);
     const [userSystems, setUserSystems] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
 
     // Buscar sistemas do usuário no Firebase
     useEffect(() => {
@@ -85,17 +87,21 @@ export function MastersArea({ user, onBack }) {
     };
 
     const handleDeleteSystem = async (systemId) => {
-        if (!window.confirm('Tem certeza que deseja deletar este sistema? Esta ação não pode ser desfeita.')) {
-            return;
-        }
-
-        try {
-            await deleteDoc(doc(db, 'rpgSystems', systemId));
-            console.log('✅ Sistema deletado:', systemId);
-        } catch (error) {
-            console.error('❌ Erro ao deletar sistema:', error);
-            alert('Erro ao deletar sistema. Tente novamente.');
-        }
+        setConfirmDialog({
+            isOpen: true,
+            title: 'Deletar Sistema',
+            message: 'Tem certeza que deseja deletar este sistema? Esta ação não pode ser desfeita.',
+            onConfirm: async () => {
+                try {
+                    await deleteDoc(doc(db, 'rpgSystems', systemId));
+                    console.log('✅ Sistema deletado:', systemId);
+                } catch (error) {
+                    console.error('❌ Erro ao deletar sistema:', error);
+                    alert('Erro ao deletar sistema. Tente novamente.');
+                }
+                setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: null });
+            }
+        });
     };
 
     return (
@@ -331,6 +337,15 @@ export function MastersArea({ user, onBack }) {
                     </div>
                 </div>
             </div>
+
+            {/* Diálogo de Confirmação */}
+            <ConfirmDialog
+                isOpen={confirmDialog.isOpen}
+                title={confirmDialog.title}
+                message={confirmDialog.message}
+                onConfirm={confirmDialog.onConfirm}
+                onCancel={() => setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: null })}
+            />
         </div>
     );
 }

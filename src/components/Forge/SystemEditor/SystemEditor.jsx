@@ -33,7 +33,11 @@ export function SystemEditor({ user, systemId: initialSystemId, initialData, onB
         combat: {
             enabled: false
         },
-        customSections: []
+        equipment: {
+            categories: [],
+            items: [],
+            inventoryRules: {}
+        }
     });
     const [systemId, setSystemId] = useState(initialSystemId || null);
     const [isSaving, setIsSaving] = useState(false);

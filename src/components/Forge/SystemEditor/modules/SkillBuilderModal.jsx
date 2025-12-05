@@ -70,7 +70,7 @@ const INITIAL_SKILL = {
     }
 };
 
-export function SkillBuilderModal({ skill, onSave, onClose }) {
+export function SkillBuilderModal({ skill, onSave, onClose, systemAttributes = [], systemDice = {}, systemProgression = {} }) {
     const [currentTab, setCurrentTab] = useState('basic');
     const [formData, setFormData] = useState(skill || { ...INITIAL_SKILL, id: `skill-${Date.now()}` });
     const [errors, setErrors] = useState({});
@@ -175,13 +175,13 @@ export function SkillBuilderModal({ skill, onSave, onClose }) {
                         <ModifiersTab formData={formData} updateFormData={updateFormData} />
                     )}
                     {currentTab === 'requirements' && (
-                        <RequirementsTab formData={formData} updateFormData={updateFormData} />
+                        <RequirementsTab formData={formData} updateFormData={updateFormData} systemAttributes={systemAttributes} />
                     )}
                     {currentTab === 'costs' && (
-                        <CostsTab formData={formData} updateFormData={updateFormData} />
+                        <CostsTab formData={formData} updateFormData={updateFormData} systemAttributes={systemAttributes} />
                     )}
                     {currentTab === 'rolls' && (
-                        <RollsTab formData={formData} updateFormData={updateFormData} />
+                        <RollsTab formData={formData} updateFormData={updateFormData} systemAttributes={systemAttributes} />
                     )}
                     {currentTab === 'progression' && (
                         <ProgressionTab formData={formData} updateFormData={updateFormData} />
@@ -812,17 +812,14 @@ function ModifiersTab({ formData, updateFormData }) {
 }
 
 // Aba de Requisitos
-function RequirementsTab({ formData, updateFormData }) {
-    const COMMON_ATTRIBUTES = [
-        { id: 'strength', label: 'Força', icon: '💪' },
-        { id: 'dexterity', label: 'Destreza', icon: '🎯' },
-        { id: 'constitution', label: 'Constituição', icon: '❤️' },
-        { id: 'intelligence', label: 'Inteligência', icon: '🧠' },
-        { id: 'wisdom', label: 'Sabedoria', icon: '👁️' },
-        { id: 'charisma', label: 'Carisma', icon: '✨' },
-        { id: 'perception', label: 'Percepção', icon: '👀' },
-        { id: 'willpower', label: 'Vontade', icon: '🛡️' }
-    ];
+function RequirementsTab({ formData, updateFormData, systemAttributes = [] }) {
+    // Usa atributos do sistema ao invés de hardcoded
+    const availableAttributes = systemAttributes.map(attr => ({
+        id: attr.id,
+        label: attr.name,
+        shortName: attr.shortName || attr.name?.substring(0, 3).toUpperCase(),
+        icon: attr.icon || '⚡'
+    }));
 
     const updateAttribute = (attrId, value) => {
         const newAttributes = { ...formData.requirements.attributes };
@@ -876,24 +873,30 @@ function RequirementsTab({ formData, updateFormData }) {
                         Defina os valores mínimos de atributos necessários para usar esta habilidade
                     </p>
 
-                    <div className={styles.attributesGrid}>
-                        {COMMON_ATTRIBUTES.map(attr => (
-                            <div key={attr.id} className={styles.attributeItem}>
-                                <div className={styles.attributeLabel}>
-                                    <span className={styles.attributeIcon}>{attr.icon}</span>
-                                    {attr.label}
+                    {availableAttributes.length === 0 ? (
+                        <div className={styles.emptyWarning}>
+                            ⚠️ Nenhum atributo definido no sistema. Crie atributos primeiro na aba "Atributos".
+                        </div>
+                    ) : (
+                        <div className={styles.attributesGrid}>
+                            {availableAttributes.map(attr => (
+                                <div key={attr.id} className={styles.attributeItem}>
+                                    <div className={styles.attributeLabel}>
+                                        <span className={styles.attributeIcon}>{attr.icon}</span>
+                                        {attr.label}
+                                    </div>
+                                    <input
+                                        type="number"
+                                        className={styles.attributeInput}
+                                        min="0"
+                                        placeholder="0"
+                                        value={formData.requirements.attributes[attr.id] || ''}
+                                        onChange={(e) => updateAttribute(attr.id, parseInt(e.target.value) || 0)}
+                                    />
                                 </div>
-                                <input
-                                    type="number"
-                                    className={styles.attributeInput}
-                                    min="0"
-                                    placeholder="0"
-                                    value={formData.requirements.attributes[attr.id] || ''}
-                                    onChange={(e) => updateAttribute(attr.id, parseInt(e.target.value) || 0)}
-                                />
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Habilidades Prerequisitas */}
@@ -971,14 +974,397 @@ function RequirementsTab({ formData, updateFormData }) {
     );
 }
 
-function CostsTab({ formData, updateFormData }) {
-    return <div className={styles.tabContent}>Custos (Em construção)</div>;
+function CostsTab({ formData, updateFormData, systemAttributes = [] }) {
+    // Filtra atributos que são pools/recursos do sistema
+    const poolAttributes = systemAttributes.filter(attr =>
+        attr.attributeType === 'pool' ||
+        attr.category === 'Recurso' ||
+        attr.category === 'Resource' ||
+        ['hp', 'mp', 'mana', 'stamina', 'ki', 'focus', 'energy', 'pv', 'pm'].some(
+            keyword => attr.name?.toLowerCase().includes(keyword) || attr.shortName?.toLowerCase().includes(keyword)
+        )
+    );
+
+    // Cria lista de recursos dinâmica
+    const RESOURCE_TYPES = [
+        { id: 'none', label: '🆓 Nenhum', description: 'Sem custo de recurso' },
+        ...poolAttributes.map(attr => ({
+            id: attr.id,
+            label: `${attr.icon || '💎'} ${attr.name}`,
+            description: attr.description || `Usa ${attr.name} como recurso`
+        }))
+    ];
+
+    // Se não tem pools detectados, adiciona aviso
+    const noPoolsWarning = poolAttributes.length === 0;
+
+    return (
+        <div className={styles.tabContent}>
+            <div className={styles.formSection}>
+                <h3 className={styles.sectionTitle}>Custos de Ativação</h3>
+                <p className={styles.sectionDescription}>
+                    Configure os recursos necessários para usar esta habilidade
+                </p>
+
+                {/* Tipo de Recurso */}
+                <div className={styles.formGroup}>
+                    <label className={styles.label}>Recurso Principal</label>
+                    {noPoolsWarning && (
+                        <div className={styles.emptyWarning}>
+                            💡 Dica: Crie atributos do tipo "Pool" (HP, MP, etc.) na aba de Atributos para definir recursos.
+                        </div>
+                    )}
+                    <div className={styles.optionsGrid}>
+                        {RESOURCE_TYPES.map(resource => (
+                            <button
+                                key={resource.id}
+                                className={`${styles.optionCard} ${formData.costs?.activation?.resource === resource.id ? styles.selected : ''}`}
+                                onClick={() => updateFormData('costs.activation.resource', resource.id)}
+                            >
+                                <div className={styles.optionLabel}>{resource.label}</div>
+                                <div className={styles.optionDesc}>{resource.description}</div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Custo de Ativação */}
+                <div className={styles.formRow}>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>Custo de Ativação</label>
+                        <input
+                            type="number"
+                            min="0"
+                            className={styles.input}
+                            placeholder="0"
+                            value={formData.costs?.activation?.amount || 0}
+                            onChange={(e) => updateFormData('costs.activation.amount', parseInt(e.target.value) || 0)}
+                        />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>Custo por Rodada (sustentado)</label>
+                        <input
+                            type="number"
+                            min="0"
+                            className={styles.input}
+                            placeholder="0"
+                            value={formData.costs?.maintenance?.amountPerRound || 0}
+                            onChange={(e) => updateFormData('costs.maintenance.amountPerRound', parseInt(e.target.value) || 0)}
+                        />
+                    </div>
+                </div>
+
+                {/* Cooldown */}
+                <div className={styles.formGroup}>
+                    <label className={styles.label}>
+                        Cooldown: {formData.costs?.cooldown || 0} rodada(s)
+                    </label>
+                    <input
+                        type="range"
+                        className={styles.slider}
+                        min="0"
+                        max="10"
+                        value={formData.costs?.cooldown || 0}
+                        onChange={(e) => updateFormData('costs.cooldown', parseInt(e.target.value))}
+                    />
+                    <div className={styles.sliderMarks}>
+                        <span>Sem CD</span>
+                        <span>5</span>
+                        <span>10</span>
+                    </div>
+                </div>
+
+                {/* Usos por Descanso */}
+                <div className={styles.formGroup}>
+                    <label className={styles.label}>Limite de Usos</label>
+                    <div className={styles.formRow}>
+                        <input
+                            type="number"
+                            min="0"
+                            className={styles.input}
+                            placeholder="Ilimitado"
+                            value={formData.costs?.usesPerRest || ''}
+                            onChange={(e) => updateFormData('costs.usesPerRest', parseInt(e.target.value) || 0)}
+                        />
+                        <select
+                            className={styles.select}
+                            value={formData.costs?.restType || 'none'}
+                            onChange={(e) => updateFormData('costs.restType', e.target.value)}
+                        >
+                            <option value="none">Sem limite</option>
+                            <option value="short">por Descanso Curto</option>
+                            <option value="long">por Descanso Longo</option>
+                            <option value="day">por Dia</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Resumo */}
+                <div className={styles.costsSummary}>
+                    <h4>📊 Resumo</h4>
+                    <p>
+                        {formData.costs?.activation?.resource === 'none' || !formData.costs?.activation?.resource
+                            ? 'Sem custo de recurso para ativar'
+                            : `${formData.costs?.activation?.amount || 0} ${systemAttributes.find(a => a.id === formData.costs?.activation?.resource)?.name || 'Recurso'
+                            } para ativar`}
+                        {formData.costs?.cooldown > 0 && `, ${formData.costs.cooldown} rodadas de cooldown`}
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
 }
 
-function RollsTab({ formData, updateFormData }) {
-    return <div className={styles.tabContent}>Testes (Em construção)</div>;
+function RollsTab({ formData, updateFormData, systemAttributes = [] }) {
+    const CHECK_TYPES = [
+        { id: 'none', label: '🚫 Nenhum', description: 'Sem teste necessário' },
+        { id: 'attack', label: '⚔️ Ataque', description: 'Teste de ataque vs defesa' },
+        { id: 'save', label: '🛡️ Resistência', description: 'Alvo faz teste para resistir' },
+        { id: 'skill', label: '🎯 Perícia', description: 'Teste de perícia/habilidade' },
+        { id: 'opposed', label: '⚖️ Contestado', description: 'Ambos rolam dados' }
+    ];
+
+    // Usa siglas dinâmicas dos atributos do sistema
+    const ATTRIBUTE_SUGGESTIONS = systemAttributes.map(attr => attr.shortName || attr.name?.substring(0, 3).toUpperCase());
+
+    return (
+        <div className={styles.tabContent}>
+            <div className={styles.formSection}>
+                <h3 className={styles.sectionTitle}>Testes e Rolagens</h3>
+                <p className={styles.sectionDescription}>
+                    Configure como a habilidade interage com o sistema de dados
+                </p>
+
+                {/* Tipo de Teste */}
+                <div className={styles.formGroup}>
+                    <label className={styles.label}>Tipo de Teste</label>
+                    <div className={styles.optionsGrid}>
+                        {CHECK_TYPES.map(check => (
+                            <button
+                                key={check.id}
+                                className={`${styles.optionCard} ${formData.rolls?.checkType === check.id ? styles.selected : ''}`}
+                                onClick={() => updateFormData('rolls.checkType', check.id)}
+                            >
+                                <div className={styles.optionLabel}>{check.label}</div>
+                                <div className={styles.optionDesc}>{check.description}</div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {formData.rolls?.checkType && formData.rolls.checkType !== 'none' && (
+                    <>
+                        {/* Atributo Base */}
+                        <div className={styles.formRow}>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Atributo Base</label>
+                                <input
+                                    type="text"
+                                    className={styles.input}
+                                    placeholder="Ex: DEX, STR, INT..."
+                                    value={formData.rolls?.baseAttribute || ''}
+                                    onChange={(e) => updateFormData('rolls.baseAttribute', e.target.value)}
+                                    list="attribute-list"
+                                />
+                                <datalist id="attribute-list">
+                                    {ATTRIBUTE_SUGGESTIONS.map(attr => (
+                                        <option key={attr} value={attr} />
+                                    ))}
+                                </datalist>
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Bônus Adicional</label>
+                                <input
+                                    type="number"
+                                    className={styles.input}
+                                    placeholder="0"
+                                    value={formData.rolls?.bonus || 0}
+                                    onChange={(e) => updateFormData('rolls.bonus', parseInt(e.target.value) || 0)}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Fórmula de Dados */}
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>Fórmula de Dados (opcional)</label>
+                            <input
+                                type="text"
+                                className={styles.input}
+                                placeholder="Ex: 1d20, 2d6+3, 1d20+DEX..."
+                                value={formData.rolls?.diceFormula || ''}
+                                onChange={(e) => updateFormData('rolls.diceFormula', e.target.value)}
+                            />
+                        </div>
+
+                        {/* DC para Resistência */}
+                        {(formData.rolls?.checkType === 'save' || formData.rolls?.checkType === 'skill') && (
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>
+                                    Dificuldade (DC): {formData.rolls?.dc || 10}
+                                </label>
+                                <input
+                                    type="range"
+                                    className={styles.slider}
+                                    min="5"
+                                    max="30"
+                                    value={formData.rolls?.dc || 10}
+                                    onChange={(e) => updateFormData('rolls.dc', parseInt(e.target.value))}
+                                />
+                                <div className={styles.sliderMarks}>
+                                    <span>Fácil (5)</span>
+                                    <span>Médio (15)</span>
+                                    <span>Épico (30)</span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Efeitos de Crítico e Fumble */}
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>✨ Efeito de Crítico (20 natural)</label>
+                            <textarea
+                                className={styles.textarea}
+                                rows={2}
+                                placeholder="Ex: Dano dobrado, efeito estendido..."
+                                value={formData.rolls?.criticalEffect || ''}
+                                onChange={(e) => updateFormData('rolls.criticalEffect', e.target.value)}
+                            />
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>💀 Efeito de Fumble (1 natural)</label>
+                            <textarea
+                                className={styles.textarea}
+                                rows={2}
+                                placeholder="Ex: Habilidade falha, afeta aliado..."
+                                value={formData.rolls?.fumbleEffect || ''}
+                                onChange={(e) => updateFormData('rolls.fumbleEffect', e.target.value)}
+                            />
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    );
 }
 
 function ProgressionTab({ formData, updateFormData }) {
-    return <div className={styles.tabContent}>Progressão (Em construção)</div>;
+    const [newLevel, setNewLevel] = React.useState({ level: 2, benefit: '' });
+
+    const addLevelBenefit = () => {
+        if (!newLevel.benefit.trim()) return;
+        const levels = [...(formData.progression?.levels || []), newLevel].sort((a, b) => a.level - b.level);
+        updateFormData('progression.levels', levels);
+        setNewLevel({ level: newLevel.level + 1, benefit: '' });
+    };
+
+    const removeBenefit = (i) => {
+        updateFormData('progression.levels', (formData.progression?.levels || []).filter((_, idx) => idx !== i));
+    };
+
+    return (
+        <div className={styles.tabContent}>
+            <div className={styles.formSection}>
+                <h3 className={styles.sectionTitle}>Progressão da Habilidade</h3>
+                <p className={styles.sectionDescription}>
+                    Configure como esta habilidade pode evoluir
+                </p>
+
+                {/* Toggle */}
+                <div className={styles.toggleSection}>
+                    <label className={styles.checkboxLabel}>
+                        <input
+                            type="checkbox"
+                            checked={formData.progression?.enabled || false}
+                            onChange={(e) => updateFormData('progression.enabled', e.target.checked)}
+                        />
+                        <span>📈 Habilidade pode evoluir</span>
+                    </label>
+                </div>
+
+                {formData.progression?.enabled && (
+                    <>
+                        {/* Nível Máximo */}
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>
+                                Nível Máximo: {formData.progression?.maxLevel || 5}
+                            </label>
+                            <input
+                                type="range"
+                                className={styles.slider}
+                                min="1"
+                                max="10"
+                                value={formData.progression?.maxLevel || 5}
+                                onChange={(e) => updateFormData('progression.maxLevel', parseInt(e.target.value))}
+                            />
+                        </div>
+
+                        {/* Lista de benefícios */}
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>🌟 Benefícios por Nível</label>
+                            {(formData.progression?.levels || []).map((lv, i) => (
+                                <div key={i} className={styles.benefitRow}>
+                                    <span className={styles.benefitLevel}>Nv.{lv.level}</span>
+                                    <span className={styles.benefitText}>{lv.benefit}</span>
+                                    <button className={styles.removeBtn} onClick={() => removeBenefit(i)}>×</button>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Adicionar */}
+                        <div className={styles.formRow}>
+                            <select
+                                className={styles.select}
+                                value={newLevel.level}
+                                onChange={(e) => setNewLevel({ ...newLevel, level: parseInt(e.target.value) })}
+                            >
+                                {Array.from({ length: 9 }, (_, i) => i + 2).map(l => (
+                                    <option key={l} value={l}>Nível {l}</option>
+                                ))}
+                            </select>
+                            <input
+                                type="text"
+                                className={styles.input}
+                                placeholder="Ex: +2 dano, +1 alcance..."
+                                value={newLevel.benefit}
+                                onChange={(e) => setNewLevel({ ...newLevel, benefit: e.target.value })}
+                                onKeyDown={(e) => e.key === 'Enter' && addLevelBenefit()}
+                            />
+                            <button className={styles.addButton} onClick={addLevelBenefit}>+</button>
+                        </div>
+
+                        {/* Templates */}
+                        <div className={styles.templatesRow}>
+                            <button
+                                className={styles.templateBtn}
+                                onClick={() => updateFormData('progression.levels', [
+                                    { level: 2, benefit: '+1 Rank' },
+                                    { level: 3, benefit: '+1 Alcance' },
+                                    { level: 4, benefit: '+2 Rank' },
+                                    { level: 5, benefit: 'Efeito extra' }
+                                ])}
+                            >
+                                ⚔️ Combate
+                            </button>
+                            <button
+                                className={styles.templateBtn}
+                                onClick={() => updateFormData('progression.levels', [
+                                    { level: 2, benefit: '-1 Custo' },
+                                    { level: 3, benefit: '+1 alvo' },
+                                    { level: 4, benefit: 'Duração 2x' },
+                                    { level: 5, benefit: 'Sem manutenção' }
+                                ])}
+                            >
+                                💙 Magia
+                            </button>
+                            <button className={styles.templateBtn} onClick={() => updateFormData('progression.levels', [])}>
+                                🧹 Limpar
+                            </button>
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    );
 }

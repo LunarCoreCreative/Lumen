@@ -118,6 +118,7 @@ function createWindow() {
 
     if (isDev) {
         win.loadURL('http://localhost:5173');
+        win.webContents.openDevTools(); // Open DevTools in dev mode
     } else {
         // Em produção, servir via HTTP local (localhost) para compatibilidade total com Firebase Auth e Google OAuth
         const http = require('http');

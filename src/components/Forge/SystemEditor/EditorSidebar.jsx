@@ -56,10 +56,10 @@ export function EditorSidebar({ currentStep, onStepChange, systemData }) {
         {
             id: 6,
             icon: Grid3x3,
-            label: 'Customizado',
-            shortLabel: 'Custom',
+            label: 'Extras',
+            shortLabel: 'Extra',
             color: '#ec4899',
-            isComplete: systemData.customSections.length > 0,
+            isComplete: (systemData.equipment?.items?.length || 0) > 0,
             optional: true
         }
     ];
