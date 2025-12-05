@@ -79,6 +79,11 @@ async function checkForUpdates(sender = null) {
         log.info(`Versão no Firestore: ${latestVersion}`);
         log.info(`Dados do Firestore:`, JSON.stringify(updateData, null, 2));
 
+        if (!latestVersion || !currentVersion) {
+            log.warn('Versão atual ou remota inválida (null/undefined). Abortando verificação.');
+            return;
+        }
+
         // Comparar versões
         if (compareVersions(latestVersion, currentVersion) > 0) {
             log.info('✨ Nova versão disponível!');
@@ -321,37 +326,53 @@ function calculateSha512(filePath) {
  * @returns {number} 1 se v1 > v2, -1 se v1 < v2, 0 se iguais
  */
 function compareVersions(v1, v2) {
-    // Separar versão principal de pre-release
-    // Ex: "0.1.0-Alpha" => ["0.1.0", "Alpha"]
-    const [version1, prerelease1] = v1.split('-');
-    const [version2, prerelease2] = v2.split('-');
+    try {
+        log.info(`Comparando versões: v1=${v1} (${typeof v1}), v2=${v2} (${typeof v2})`);
 
-    // Comparar versões principais (0.1.0 vs 0.0.10)
-    const parts1 = version1.split('.').map(Number);
-    const parts2 = version2.split('.').map(Number);
+        if (!v1 || !v2) {
+            log.warn('Uma das versões é nula ou indefinida. Retornando 0.');
+            return 0;
+        }
 
-    for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
-        const part1 = parts1[i] || 0;
-        const part2 = parts2[i] || 0;
+        // Garantir que são strings
+        const s1 = String(v1);
+        const s2 = String(v2);
 
-        if (part1 > part2) return 1;
-        if (part1 < part2) return -1;
+        // Separar versão principal de pre-release
+        // Ex: "0.1.0-Alpha" => ["0.1.0", "Alpha"]
+        const [version1, prerelease1] = s1.split('-');
+        const [version2, prerelease2] = s2.split('-');
+
+        // Comparar versões principais (0.1.0 vs 0.0.10)
+        const parts1 = version1.split('.').map(Number);
+        const parts2 = version2.split('.').map(Number);
+
+        for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+            const part1 = parts1[i] || 0;
+            const part2 = parts2[i] || 0;
+
+            if (part1 > part2) return 1;
+            if (part1 < part2) return -1;
+        }
+
+        // Se as versões principais são iguais, comparar pre-release
+        // Regra: versão sem pre-release é MAIOR que versão com pre-release
+        // Ex: 0.1.0 > 0.1.0-Alpha
+        if (!prerelease1 && prerelease2) return 1;  // v1 é release, v2 é pre-release
+        if (prerelease1 && !prerelease2) return -1; // v1 é pre-release, v2 é release
+
+        // Ambos têm pre-release ou ambos não têm
+        if (prerelease1 && prerelease2) {
+            // Comparação alfabética simples (Beta > Alpha, etc)
+            if (prerelease1 > prerelease2) return 1;
+            if (prerelease1 < prerelease2) return -1;
+        }
+
+        return 0;
+    } catch (error) {
+        log.error('Erro ao comparar versões:', error);
+        return 0;
     }
-
-    // Se as versões principais são iguais, comparar pre-release
-    // Regra: versão sem pre-release é MAIOR que versão com pre-release
-    // Ex: 0.1.0 > 0.1.0-Alpha
-    if (!prerelease1 && prerelease2) return 1;  // v1 é release, v2 é pre-release
-    if (prerelease1 && !prerelease2) return -1; // v1 é pre-release, v2 é release
-
-    // Ambos têm pre-release ou ambos não têm
-    if (prerelease1 && prerelease2) {
-        // Comparação alfabética simples (Beta > Alpha, etc)
-        if (prerelease1 > prerelease2) return 1;
-        if (prerelease1 < prerelease2) return -1;
-    }
-
-    return 0;
 }
 
 module.exports = {
