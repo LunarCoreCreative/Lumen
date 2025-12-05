@@ -328,6 +328,7 @@
     color: #ef4444;
     transform: scale(1.05);
 }
+
 /* Estilo especial para RPG Forge */
 .forgeItem {
     background: linear-gradient(90deg, rgba(139, 92, 246, 0.15), rgba(251, 191, 36, 0.08)) !important;
@@ -345,6 +346,29 @@
 
 .forgeItem .navLabel {
     background: linear-gradient(135deg, #a78bfa, #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 600;
+}
+
+/* Estilo especial para Gaming Hub */
+.hubItem {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.15), rgba(6, 182, 212, 0.08)) !important;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.hubItem:hover {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.25), rgba(6, 182, 212, 0.15)) !important;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+}
+
+.hubItem .navIcon {
+    color: #60a5fa;
+}
+
+.hubItem .navLabel {
+    background: linear-gradient(135deg, #60a5fa, #22d3ee);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

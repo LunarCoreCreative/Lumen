@@ -31,7 +31,7 @@ export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onL
 
     const menuItems = [
         { id: 'feed', icon: Home, label: 'Feed', active: true },
-        { id: 'hub', icon: Gamepad2, label: 'Hub', active: true },
+        { id: 'hub', icon: Gamepad2, label: 'Gaming Hub', active: true, special: 'hub' },
         { id: 'forge', icon: Dices, label: 'RPG Forge', active: true, special: true },
         { id: 'news', icon: Megaphone, label: 'Novidades', active: true },
         { id: 'chat', icon: MessageCircle, label: 'Mensagens', badge: unreadCount },
@@ -61,7 +61,7 @@ export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onL
                         return (
                             <div
                                 key={item.id}
-                                className={`${styles.navItem} ${isActive ? styles.active : ''} ${item.special ? styles.forgeItem : ''}`}
+                                className={`${styles.navItem} ${isActive ? styles.active : ''} ${item.special === 'hub' ? styles.hubItem : ''} ${item.special === true ? styles.forgeItem : ''}`}
                                 onClick={() => item.active !== false && onNavigate(item.id)}
                             >
                                 <div className={styles.navIconWrapper}>

@@ -4,9 +4,16 @@ import { ChatSidebar } from './ChatSidebar';
 import { ChatWindow } from './ChatWindow';
 import { chatActions } from '../../hooks/useChat';
 
-export function ChatView({ user, onViewProfile }) {
+export function ChatView({ user, onViewProfile, initialChatUser }) {
     const [activeChat, setActiveChat] = useState(null);
     const [loadingChat, setLoadingChat] = useState(false);
+
+    // Abrir chat inicial se fornecido
+    React.useEffect(() => {
+        if (initialChatUser) {
+            handleSelectChat(initialChatUser);
+        }
+    }, [initialChatUser]);
 
     const handleSelectChat = async (friend) => {
         if (!user?.uid || !friend?.uid) return;

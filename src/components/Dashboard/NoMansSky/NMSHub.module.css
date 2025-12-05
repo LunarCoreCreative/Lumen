@@ -1,0 +1,386 @@
+/* ==================== NMS HUB - SPACE STATION DASHBOARD ==================== */
+
+.hubContainer {
+    width: 100%;
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==================== STATS BAR ==================== */
+.statsBar {
+    display: flex;
+    gap: 2rem;
+    padding: 1rem 1.5rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 70, 85, 0.15);
+    border-left: 2px solid #ff4655;
+    margin-bottom: 2rem;
+}
+
+.statItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.statItem svg {
+    color: #ff4655;
+}
+
+/* ==================== FEATURED CARD ==================== */
+.featuredCard {
+    position: relative;
+    padding: 2.5rem;
+    background: linear-gradient(135deg, rgba(255, 70, 85, 0.08) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(255, 70, 85, 0.05) 100%);
+    border: 1px solid rgba(255, 70, 85, 0.25);
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    margin-bottom: 2.5rem;
+}
+
+.featuredCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ff4655, transparent);
+}
+
+.featuredCard:hover {
+    border-color: rgba(255, 70, 85, 0.5);
+    box-shadow:
+        0 0 60px rgba(255, 70, 85, 0.15),
+        inset 0 0 60px rgba(255, 70, 85, 0.03);
+    transform: translateY(-2px);
+}
+
+.featuredGlow {
+    position: absolute;
+    top: 50%;
+    left: -20%;
+    width: 40%;
+    height: 200%;
+    background: radial-gradient(ellipse, rgba(255, 70, 85, 0.15) 0%, transparent 70%);
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.featuredScanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255, 70, 85, 0.8), transparent);
+    animation: scanDown 3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes scanDown {
+
+    0%,
+    100% {
+        top: 0;
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
+}
+
+.featuredContent {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    position: relative;
+    z-index: 2;
+}
+
+.featuredIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 70, 85, 0.1);
+    border: 1px solid rgba(255, 70, 85, 0.3);
+    color: #ff4655;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.featuredIcon::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(135deg, rgba(255, 70, 85, 0.5), transparent, rgba(255, 70, 85, 0.3));
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.featuredCard:hover .featuredIcon::before {
+    opacity: 1;
+}
+
+.featuredIcon svg {
+    filter: drop-shadow(0 0 20px rgba(255, 70, 85, 0.5));
+}
+
+.featuredInfo {
+    flex: 1;
+}
+
+.featuredBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.7rem;
+    background: rgba(255, 70, 85, 0.15);
+    border: 1px solid #ff4655;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #ff4655;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+}
+
+.featuredTitle {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 0.75rem 0;
+    letter-spacing: -0.02em;
+}
+
+.featuredDescription {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.6;
+    margin: 0 0 1.5rem 0;
+    max-width: 500px;
+}
+
+.featuredMeta {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.featuredCount {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.featuredAction {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ff4655;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.3s;
+}
+
+.featuredCard:hover .featuredAction {
+    gap: 0.8rem;
+}
+
+.featuredPattern {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40%;
+    height: 100%;
+    background: repeating-linear-gradient(-45deg,
+            transparent,
+            transparent 10px,
+            rgba(255, 70, 85, 0.02) 10px,
+            rgba(255, 70, 85, 0.02) 20px);
+    pointer-events: none;
+}
+
+/* ==================== SECTION DIVIDER ==================== */
+.sectionDivider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    white-space: nowrap;
+}
+
+.sectionLine {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 70, 85, 0.3), transparent);
+}
+
+/* ==================== SECTIONS GRID ==================== */
+.sectionsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.sectionCard {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.sectionCard::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #ff4655;
+    transition: width 0.3s ease;
+}
+
+.sectionCard:hover {
+    background: rgba(255, 70, 85, 0.05);
+    border-color: rgba(255, 70, 85, 0.2);
+}
+
+.sectionCard:hover::before {
+    width: 100%;
+}
+
+.sectionCardDisabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.sectionCardDisabled:hover {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.sectionCardDisabled:hover::before {
+    width: 0;
+}
+
+.sectionIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 70, 85, 0.1);
+    border: 1px solid rgba(255, 70, 85, 0.2);
+    color: #ff4655;
+    flex-shrink: 0;
+}
+
+.sectionContent {
+    flex: 1;
+    min-width: 0;
+}
+
+.sectionName {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 0.25rem 0;
+}
+
+.sectionDescription {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.comingSoonBadge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.2rem 0.5rem;
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #ffd700;
+    text-transform: uppercase;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 900px) {
+    .sectionsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .featuredContent {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .featuredDescription {
+        max-width: none;
+    }
+
+    .featuredMeta {
+        justify-content: center;
+    }
+
+    .sectionsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .statsBar {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}

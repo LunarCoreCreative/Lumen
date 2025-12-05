@@ -30,6 +30,7 @@ import { MainLayout } from '../Layout/MainLayout';
 export function Dashboard({ user }) {
     const [currentView, setCurrentView] = useState('feed'); // 'feed' | 'profile' | 'notifications' | 'chat' | 'search'
     const [viewingUser, setViewingUser] = useState(null); // Usuário sendo visualizado no perfil
+    const [targetChatUser, setTargetChatUser] = useState(null); // Usuário alvo para iniciar chat
     const [searchQuery, setSearchQuery] = useState('');
 
     // Hook de Notificações
@@ -123,6 +124,11 @@ export function Dashboard({ user }) {
         setCurrentView('profile');
     };
 
+    const handleMessageUser = (targetUser) => {
+        setTargetChatUser(targetUser);
+        setCurrentView('chat');
+    };
+
     const handleClearHistory = () => {
         showConfirm(
             "Limpar Histórico",
@@ -189,7 +195,7 @@ export function Dashboard({ user }) {
             case 'owner':
                 return <OwnerPanel user={user} />;
             case 'chat':
-                return <ChatView user={user} onViewProfile={handleViewProfile} />;
+                return <ChatView user={user} onViewProfile={handleViewProfile} initialChatUser={targetChatUser} />;
             case 'settings':
                 return <Settings user={user} onLogout={handleLogout} />;
             default: // 'feed'
@@ -248,6 +254,7 @@ export function Dashboard({ user }) {
                         <FriendsSidebar
                             user={user}
                             onUserClick={handleViewProfile}
+                            onMessageClick={handleMessageUser}
                         />
                     ) : null
                 }

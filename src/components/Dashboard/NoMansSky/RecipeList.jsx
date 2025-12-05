@@ -2,201 +2,46 @@ import React, { useState, useEffect } from 'react';
 import styles from './NoMansSky.module.css';
 import { RecipeCard } from './RecipeCard';
 import { Loader } from 'lucide-react';
+import { subscribeToRecipes, deleteRecipe, initializeDefaultRecipes } from './recipeService';
 
-export function RecipeList({ searchQuery, showFilters, customRecipes = [], isAdmin = false, onDeleteRecipe }) {
+export function RecipeList({ searchQuery = '', showFilters, isAdmin = false }) {
     const [recipes, setRecipes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('all');
-    const [sortBy, setSortBy] = useState('name'); // 'name', 'time', 'ratio'
+    const [sortBy, setSortBy] = useState('name');
 
-    const handleDeleteRecipe = (recipeId) => {
-        // Verificar se é uma receita customizada ou padrão
-        const isCustom = customRecipes.some(r => r.id === recipeId);
-
-        if (isCustom && onDeleteRecipe) {
-            // Deletar receita customizada via callback do pai
-            onDeleteRecipe(recipeId);
-        } else {
-            // Deletar receita padrão do estado local
-            setRecipes(recipes.filter(recipe => recipe.id !== recipeId));
-        }
-
-        console.log('Receita deletada:', recipeId);
-    };
-
-    // TODO: Substituir por hook useGamingContent quando implementado
+    // Carregar receitas do Firebase com listener em tempo real
     useEffect(() => {
-        // Dados de exemplo com receitas reais de No Man's Sky
-        const sampleRecipes = [
-            {
-                id: '1',
-                name: 'Ferrita Pura de Poeira de Ferrita',
-                inputs: [
-                    { material: 'Poeira de Ferrita', quantity: 1, icon: null }
-                ],
-                output: {
-                    material: 'Ferrita Pura',
-                    quantity: 1,
-                    icon: null
-                },
-                time: 0.6,
-                category: 'Metal',
-                tags: ['refinamento', 'básico', 'metal'],
-                ratio: 1.0
-            },
-            {
-                id: '2',
-                name: 'Ferrita Magnetizada de Ferrita Pura',
-                inputs: [
-                    { material: 'Ferrita Pura', quantity: 1, icon: null }
-                ],
-                output: {
-                    material: 'Ferrita Magnetizada',
-                    quantity: 1,
-                    icon: null
-                },
-                time: 0.9,
-                category: 'Metal',
-                tags: ['refinamento', 'avançado', 'metal'],
-                ratio: 1.0
-            },
-            {
-                id: '3',
-                name: 'Metal Cromático de Cobre',
-                inputs: [
-                    { material: 'Cobre', quantity: 2, icon: null }
-                ],
-                output: {
-                    material: 'Metal Cromático',
-                    quantity: 1,
-                    icon: null
-                },
-                time: 0.6,
-                category: 'Metal',
-                tags: ['refinamento', 'cromático', 'metal'],
-                ratio: 0.5
-            },
-            {
-                id: '4',
-                name: 'Carbono de Carbono Condensado',
-                inputs: [
-                    { material: 'Carbono Condensado', quantity: 1, icon: null }
-                ],
-                output: {
-                    material: 'Carbono',
-                    quantity: 2,
-                    icon: null
-                },
-                time: 0.6,
-                category: 'Orgânico',
-                tags: ['refinamento', 'básico', 'orgânico'],
-                ratio: 2.0
-            },
-            {
-                id: '5',
-                name: 'Nitrogênio de Sal e Oxigênio',
-                inputs: [
-                    { material: 'Sal', quantity: 1, icon: null },
-                    { material: 'Oxigênio', quantity: 1, icon: null }
-                ],
-                output: {
-                    material: 'Nitrogênio',
-                    quantity: 1,
-                    icon: null
-                },
-                time: 0.6,
-                category: 'Gás',
-                tags: ['refinamento', 'duplo', 'gás'],
-                ratio: 0.5
-            },
-            {
-                id: '6',
-                name: 'Vidro de Frost Crystal',
-                inputs: [
-                    { material: 'Frost Crystal', quantity: 50, icon: null }
-                ],
-                output: {
-                    material: 'Vidro',
-                    quantity: 1,
-                    icon: null
-                },
-                time: 0.6,
-                category: 'Componente',
-                tags: ['refinamento', 'componente'],
-                ratio: 0.02
-            },
-            {
-                id: '7',
-                name: 'Irídio de Platina, Ouro e Prata',
-                inputs: [
-                    { material: 'Platina', quantity: 1, icon: null },
-                    { material: 'Ouro', quantity: 1, icon: null },
-                    { material: 'Prata', quantity: 1, icon: null }
-                ],
-                output: {
-                    material: 'Irídio',
-                    quantity: 6,
-                    icon: null
-                },
-                time: 0.9,
-                category: 'Metal',
-                tags: ['refinamento', 'triplo', 'metal', 'avançado'],
-                ratio: 2.0
-            },
-            {
-                id: '8',
-                name: 'Gelatina Instável de Carbono, Oxigênio e Sal',
-                inputs: [
-                    { material: 'Carbono', quantity: 50, icon: null },
-                    { material: 'Oxigênio', quantity: 20, icon: null },
-                    { material: 'Sal', quantity: 15, icon: null }
-                ],
-                output: {
-                    material: 'Gelatina Instável',
-                    quantity: 1,
-                    icon: null
-                },
-                time: 1.2,
-                category: 'Orgânico',
-                tags: ['refinamento', 'triplo', 'orgânico', 'raro'],
-                ratio: 0.012
-            },
-            {
-                id: '9',
-                name: 'Supercondutores de Cádmio, Índio e Emeril',
-                inputs: [
-                    { material: 'Cádmio', quantity: 100, icon: null },
-                    { material: 'Índio', quantity: 100, icon: null },
-                    { material: 'Emeril', quantity: 100, icon: null }
-                ],
-                output: {
-                    material: 'Supercondutores',
-                    quantity: 1,
-                    icon: null
-                },
-                time: 0.9,
-                category: 'Componente',
-                tags: ['refinamento', 'triplo', 'componente', 'avançado'],
-                ratio: 0.0033
-            }
-        ];
+        // Inicializar receitas padrão se necessário
+        initializeDefaultRecipes();
 
-        // Simular carregamento e mesclar com receitas customizadas
-        setTimeout(() => {
-            setRecipes([...sampleRecipes, ...customRecipes]);
+        // Listener em tempo real
+        const unsubscribe = subscribeToRecipes((recipesFromFirebase) => {
+            setRecipes(recipesFromFirebase);
             setLoading(false);
-        }, 500);
-    }, [customRecipes]);
+        });
+
+        // Cleanup ao desmontar
+        return () => unsubscribe();
+    }, []);
+
+    const handleDeleteRecipe = async (recipeId) => {
+        try {
+            await deleteRecipe(recipeId);
+            console.log('Receita deletada do Firebase:', recipeId);
+        } catch (error) {
+            console.error('Erro ao deletar receita:', error);
+            alert('Erro ao deletar receita. Tente novamente.');
+        }
+    };
 
     // Filtrar receitas
     const filteredRecipes = recipes.filter(recipe => {
-        // Filtro de busca
         const matchesSearch = searchQuery === '' ||
             recipe.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             recipe.inputs.some(input => input.material.toLowerCase().includes(searchQuery.toLowerCase())) ||
             recipe.output.material.toLowerCase().includes(searchQuery.toLowerCase());
 
-        // Filtro de categoria
         const matchesCategory = selectedCategory === 'all' || recipe.category === selectedCategory;
 
         return matchesSearch && matchesCategory;
@@ -222,7 +67,7 @@ export function RecipeList({ searchQuery, showFilters, customRecipes = [], isAdm
         return (
             <div className={styles.loadingContainer}>
                 <Loader className={styles.spinner} size={32} />
-                <p>Carregando receitas...</p>
+                <p>Carregando receitas do Firebase...</p>
             </div>
         );
     }

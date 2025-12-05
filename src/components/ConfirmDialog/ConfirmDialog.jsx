@@ -1,11 +1,13 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import styles from './ConfirmDialog.module.css';
 import { AlertTriangle, X } from 'lucide-react';
 
 export function ConfirmDialog({ isOpen, title, message, onConfirm, onCancel }) {
     if (!isOpen) return null;
 
-    return (
+    // Usar portal para renderizar no body, fora de qualquer stacking context
+    return ReactDOM.createPortal(
         <div className={styles.overlay} onClick={onCancel}>
             <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
                 <button className={styles.closeButton} onClick={onCancel}>
@@ -30,6 +32,7 @@ export function ConfirmDialog({ isOpen, title, message, onConfirm, onCancel }) {
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

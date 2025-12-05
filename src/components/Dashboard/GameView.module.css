@@ -1,111 +1,293 @@
+/* ==================== GAME VIEW - SCI-FI TERMINAL DESIGN ==================== */
+
 .gameViewContainer {
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
+    position: relative;
     overflow-y: auto;
-    background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+    overflow-x: hidden;
+    background: #080810;
 }
 
-/* Header & Banner */
+/* ==================== AMBIENT BACKGROUND ==================== */
+.ambientBg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.ambientOrb1 {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 15%, transparent) 0%, transparent 70%);
+    top: -200px;
+    right: -100px;
+    filter: blur(80px);
+    animation: orbFloat 25s ease-in-out infinite;
+}
+
+.ambientOrb2 {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 70%);
+    bottom: -100px;
+    left: -50px;
+    filter: blur(60px);
+    animation: orbFloat 20s ease-in-out infinite reverse;
+}
+
+@keyframes orbFloat {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(30px, -20px);
+    }
+}
+
+/* ==================== PARTICLES ==================== */
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    width: var(--size);
+    height: var(--size);
+    background: var(--accent);
+    border-radius: 50%;
+    left: var(--x);
+    animation: particleRise var(--duration) linear infinite;
+    animation-delay: var(--delay);
+    opacity: 0;
+}
+
+@keyframes particleRise {
+    0% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.5;
+    }
+
+    90% {
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+}
+
+/* ==================== HERO HEADER - PREMIUM ==================== */
 .header {
     position: relative;
-    width: 100%;
+    z-index: 2;
 }
 
-.banner {
+.heroBanner {
     position: relative;
-    width: 100%;
-    height: 300px;
+    height: 280px;
     background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background-position: center top;
+    display: flex;
+    flex-direction: column;
 }
 
-.bannerOverlay {
+.heroOverlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+            rgba(8, 8, 16, 0.4) 0%,
+            rgba(8, 8, 16, 0.6) 40%,
+            rgba(8, 8, 16, 0.95) 85%,
+            rgba(8, 8, 16, 1) 100%);
+}
+
+/* Scan line effect */
+.heroBanner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg,
+            transparent,
+            transparent 3px,
+            rgba(255, 70, 85, 0.02) 3px,
+            rgba(255, 70, 85, 0.02) 6px);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Moving scan line */
+.heroBanner::after {
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    background: linear-gradient(to bottom,
-            rgba(0, 0, 0, 0.3) 0%,
-            rgba(10, 10, 15, 0.8) 70%,
-            rgba(10, 10, 15, 1) 100%);
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent, #ff4655), transparent);
+    animation: scanDown 4s linear infinite;
+    z-index: 3;
 }
 
-.bannerContent {
-    position: relative;
-    z-index: 1;
-    height: 100%;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+@keyframes scanDown {
+    0% {
+        top: 0;
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
 }
 
 .backButton {
+    position: absolute;
+    top: 1.25rem;
+    left: 1.25rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem 0.9rem;
+    background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 70, 85, 0.3);
     color: white;
-    padding: 0.75rem 1.25rem;
-    border-radius: 8px;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    align-self: flex-start;
+    transition: all 0.2s ease;
+    z-index: 5;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .backButton:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 70, 85, 0.15);
+    border-color: #ff4655;
     transform: translateX(-4px);
 }
 
-.gameInfo {
+.heroContent {
+    position: relative;
+    z-index: 4;
     margin-top: auto;
+    padding: 1.5rem 2rem 2rem;
 }
 
-.gameName {
-    font-size: 3rem;
-    font-weight: 700;
-    color: white;
-    margin: 0 0 0.5rem 0;
-    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+.heroMeta {
+    margin-bottom: 0.75rem;
 }
 
-.gameDescription {
-    font-size: 1.125rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin: 0;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-}
-
-/* Toolbar */
-.toolbar {
-    display: flex;
+.heroBadge {
+    display: inline-flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1.5rem 2rem;
-    background: rgba(255, 255, 255, 0.03);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 0.4rem;
+    padding: 0.35rem 0.7rem;
+    background: transparent;
+    border: 1px solid var(--accent, #ff4655);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--accent, #ff4655);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.heroBadge::before {
+    content: '◆';
+    font-size: 0.5rem;
+    animation: pulseDot 2s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+}
+
+.heroTitle {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.02em;
+    text-shadow: 0 0 40px rgba(255, 70, 85, 0.3);
+}
+
+.heroSubtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+    max-width: 500px;
+}
+
+/* ==================== STICKY TOOLBAR ==================== */
+.toolbar {
     position: sticky;
     top: 0;
     z-index: 10;
-    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 2rem;
+    background: rgba(8, 8, 16, 0.98);
+    backdrop-filter: none;
+    border-bottom: 1px solid rgba(255, 70, 85, 0.15);
 }
 
-.searchBar {
+.toolbar::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 70, 85, 0.5), transparent);
+}
+
+.searchWrapper {
     flex: 1;
     position: relative;
-    max-width: 500px;
+    max-width: 400px;
 }
 
 .searchIcon {
     position: absolute;
-    left: 1rem;
+    left: 0.9rem;
     top: 50%;
     transform: translateY(-50%);
     color: rgba(255, 255, 255, 0.4);
@@ -114,110 +296,121 @@
 
 .searchInput {
     width: 100%;
-    padding: 0.875rem 1rem 0.875rem 3rem;
-    background: rgba(255, 255, 255, 0.05);
+    padding: 0.65rem 1rem 0.65rem 2.5rem;
+    background: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
     color: white;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
 }
 
 .searchInput:focus {
     outline: none;
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(102, 126, 234, 0.5);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #ff4655;
+    background: rgba(255, 70, 85, 0.05);
 }
 
 .searchInput::placeholder {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.35);
 }
 
 .toolbarActions {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.6rem;
 }
 
-.filterButton,
-.addButton {
+.toolbarBtn {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.875rem 1.25rem;
-    border-radius: 8px;
-    font-size: 0.875rem;
+    gap: 0.4rem;
+    padding: 0.65rem 1rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
-.filterButton {
-    background: rgba(255, 255, 255, 0.05);
+.toolbarBtn:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
+.toolbarBtn.active {
+    border-color: #ff4655;
+    color: #ff4655;
+    background: rgba(255, 70, 85, 0.1);
+}
+
+.addBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.65rem 1.1rem;
+    background: #ff4655;
+    border: 1px solid #ff4655;
     color: white;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    box-shadow: 0 0 20px rgba(255, 70, 85, 0.25);
 }
 
-.filterButton:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
-.addButton {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-color: transparent;
-}
-
-.addButton:hover {
+.addBtn:hover {
+    background: #ff5a67;
+    box-shadow: 0 0 30px rgba(255, 70, 85, 0.4);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
 }
 
-/* Content */
+/* ==================== CONTENT ==================== */
 .content {
-    padding: 2rem;
+    position: relative;
+    z-index: 2;
+    padding: 1.5rem 2rem 4rem;
 }
 
-/* Scrollbar */
+/* ==================== SCROLLBAR ==================== */
 .gameViewContainer::-webkit-scrollbar {
     width: 8px;
 }
 
 .gameViewContainer::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.3);
 }
 
 .gameViewContainer::-webkit-scrollbar-thumb {
-    background: rgba(102, 126, 234, 0.5);
-    border-radius: 4px;
+    background: #ff4655;
 }
 
-.gameViewContainer::-webkit-scrollbar-thumb:hover {
-    background: rgba(102, 126, 234, 0.7);
-}
-
-/* Responsive */
+/* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
-    .banner {
-        height: 200px;
+    .heroBanner {
+        height: 220px;
     }
 
-    .gameName {
+    .heroTitle {
         font-size: 2rem;
     }
 
-    .gameDescription {
-        font-size: 1rem;
+    .heroSubtitle {
+        font-size: 0.9rem;
     }
 
     .toolbar {
         flex-direction: column;
-        align-items: stretch;
+        padding: 1rem;
     }
 
-    .searchBar {
+    .searchWrapper {
         max-width: none;
+        width: 100%;
     }
 
     .toolbarActions {
@@ -226,6 +419,6 @@
     }
 
     .content {
-        padding: 1rem;
+        padding: 1rem 1rem 3rem;
     }
 }

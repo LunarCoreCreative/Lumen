@@ -69,7 +69,6 @@ export function AddRecipeModal({ isOpen, onClose, onSave }) {
         }
 
         const recipe = {
-            id: Date.now().toString(),
             name: recipeName,
             inputs: inputs,
             output: output,
