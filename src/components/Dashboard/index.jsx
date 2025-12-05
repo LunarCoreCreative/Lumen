@@ -10,7 +10,7 @@ import { FriendsSidebar } from './FriendsSidebar';
 import { TopBar } from './TopBar';
 import { Feed } from './Feed';
 import { Modal } from './Modal';
-import { UserProfile } from '../UserProfile/UserProfile';
+import { ProfileHub } from '../UserProfile/ProfileHub';
 import { Notifications } from './Notifications';
 import { useNotifications } from '../../hooks/useNotifications';
 import { NewsFeed } from './NewsFeed';
@@ -19,6 +19,7 @@ import { GamingHub } from './GamingHub';
 import { OwnerPanel } from './OwnerPanel';
 import { SearchResults } from './SearchResults';
 import { ForgeHub } from '../Forge';
+import { ArtGallery } from './ArtGallery';
 
 
 // Componentes Externos
@@ -40,6 +41,7 @@ export function Dashboard({ user }) {
 
     const [targetPostId, setTargetPostId] = useState(null);
     const [targetCommentId, setTargetCommentId] = useState(null);
+    const [initialArtId, setInitialArtId] = useState(null);
 
     // Estado do Modal
     const [modalConfig, setModalConfig] = useState({
@@ -111,6 +113,10 @@ export function Dashboard({ user }) {
 
     const handleNavigate = (view) => {
         setCurrentView(view);
+        // Limpar estados de navegação profunda
+        setInitialArtId(null);
+        setTargetPostId(null);
+        setTargetCommentId(null);
     };
 
     const handleGoToPost = (postId, commentId = null) => {
@@ -127,6 +133,11 @@ export function Dashboard({ user }) {
     const handleMessageUser = (targetUser) => {
         setTargetChatUser(targetUser);
         setCurrentView('chat');
+    };
+
+    const handleNavigateToArt = (artId) => {
+        setInitialArtId(artId);
+        setCurrentView('gallery');
     };
 
     const handleClearHistory = () => {
@@ -163,7 +174,7 @@ export function Dashboard({ user }) {
                 );
             case 'profile':
                 return (
-                    <UserProfile
+                    <ProfileHub
                         key={viewingUser ? viewingUser.uid : user.uid}
                         user={viewingUser || user}
                         onBack={() => {
@@ -190,6 +201,8 @@ export function Dashboard({ user }) {
                 return <NewsFeed user={user} />;
             case 'hub':
                 return <GamingHub user={user} />;
+            case 'gallery':
+                return <ArtGallery user={user} initialArtId={initialArtId} onShowAlert={showAlert} />;
             case 'forge':
                 return <ForgeHub user={user} />;
             case 'owner':
@@ -207,6 +220,7 @@ export function Dashboard({ user }) {
                         initialPostId={targetPostId}
                         initialCommentId={targetCommentId}
                         onUserClick={handleViewProfile}
+                        onNavigateToArt={handleNavigateToArt}
                     />
                 );
         }

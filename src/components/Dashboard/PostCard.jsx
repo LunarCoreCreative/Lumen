@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextWithEmojis } from '../TextWithEmojis';
 import { RichTextRenderer } from '../RichTextRenderer';
-import { LumenSpark, EditIcon, DeleteIcon, BoldIcon, ItalicIcon, StrikeIcon, CodeIcon } from '../Icons';
+import { LumenSpark, EditIcon, DeleteIcon, BoldIcon, ItalicIcon, StrikeIcon, CodeIcon, ImageIcon } from '../Icons';
 import { CommentItem } from '../CommentItem';
 import { CommentInput } from '../CommentInput';
 import { CodeEditorDialog } from '../CodeEditorDialog';
@@ -66,7 +66,7 @@ const CollapsibleContent = ({ children, maxHeight = 400 }) => {
     );
 };
 
-export function PostCard({ post, user, onShowAlert, onShowConfirm, targetCommentId, onUserClick }) {
+export function PostCard({ post, user, onShowAlert, onShowConfirm, targetCommentId, onUserClick, onNavigateToArt }) {
     const [isEditing, setIsEditing] = useState(false);
     const [editForm, setEditForm] = useState({ text: post.text, image: null, imageUrl: post.imageUrl });
     const [showComments, setShowComments] = useState(false);
@@ -317,7 +317,19 @@ export function PostCard({ post, user, onShowAlert, onShowConfirm, targetComment
                             <RichTextRenderer text={post.text} />
                         </CollapsibleContent>
                     </div>
-                    {post.imageUrl && (
+                    {post.sharedFromArtId ? (
+                        <div className={styles.sharedArtCard} onClick={() => onNavigateToArt && onNavigateToArt(post.sharedFromArtId)}>
+                            <div className={styles.sharedArtImageContainer}>
+                                <img src={post.imageUrl} alt="Shared Art" className={styles.sharedArtImage} loading="lazy" />
+                                <div className={styles.sharedArtOverlay}>
+                                    <span className={styles.viewArtLabel}>
+                                        <ImageIcon size={16} />
+                                        Ver na Galeria
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    ) : post.imageUrl && (
                         <div className={styles.postImageContainer}>
                             <img src={post.imageUrl} alt="Post content" className={styles.postImage} loading="lazy" />
                         </div>

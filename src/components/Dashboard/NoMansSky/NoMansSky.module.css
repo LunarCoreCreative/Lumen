@@ -726,3 +726,191 @@
         display: none;
     }
 }
+
+.populateButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 70, 85, 0.1);
+    border: 1px solid #ff4655;
+    color: #ff4655;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.populateButton:hover {
+    background: rgba(255, 70, 85, 0.2);
+    box-shadow: 0 0 10px rgba(255, 70, 85, 0.3);
+}
+
+/* Resource Detail Modal */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.detailModalContent {
+    background-color: var(--lumen-surface);
+    border: 1px solid var(--lumen-border);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    animation: modalSlideIn 0.3s ease-out;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    position: relative;
+    z-index: 1001;
+}
+
+.detailModalHeader {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--lumen-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to right, rgba(255, 70, 85, 0.1), transparent);
+}
+
+.detailTitle {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--lumen-text);
+}
+
+.detailTitle h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.detailIcon {
+    color: #ff4655;
+}
+
+.detailTabs {
+    display: flex;
+    border-bottom: 1px solid var(--lumen-border);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.detailTab {
+    flex: 1;
+    padding: 1rem;
+    background: transparent;
+    border: none;
+    color: var(--lumen-text-dim);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+}
+
+.detailTab:hover {
+    color: var(--lumen-text);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.detailTab.active {
+    color: #ff4655;
+    border-bottom-color: #ff4655;
+    background: rgba(255, 70, 85, 0.05);
+}
+
+.detailBody {
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.detailRecipeRow {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s;
+}
+
+.detailRecipeRow:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.detailInputs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.detailMaterial {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.detailQty {
+    color: #ff4655;
+    font-weight: 600;
+}
+
+.detailName {
+    color: var(--lumen-text);
+}
+
+.detailArrowContainer {
+    padding: 0 1rem;
+    color: var(--lumen-text-dim);
+    display: flex;
+    align-items: center;
+}
+
+.detailOutput {
+    flex: 1;
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.detailMeta {
+    margin-left: 1.5rem;
+    padding-left: 1.5rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--lumen-text-dim);
+    font-size: 0.85rem;
+    min-width: 60px;
+}
+
+.emptyState {
+    text-align: center;
+    color: var(--lumen-text-dim);
+    padding: 2rem;
+    font-style: italic;
+}

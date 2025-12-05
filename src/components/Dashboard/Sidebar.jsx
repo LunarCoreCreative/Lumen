@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Sidebar.module.css';
-import { Home, Megaphone, MessageCircle, Settings, User, LogOut, Bell, Gamepad2, Crown, Dices } from 'lucide-react';
+import { Home, Megaphone, MessageCircle, Settings, User, LogOut, Bell, Gamepad2, Crown, Dices, Palette } from 'lucide-react';
 import { ref, onValue } from 'firebase/database';
 import { dbRealtime } from '../../firebase';
 import { useIsOwner } from '../../hooks/useIsOwner';
@@ -31,6 +31,7 @@ export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onL
 
     const menuItems = [
         { id: 'feed', icon: Home, label: 'Feed', active: true },
+        { id: 'gallery', icon: Palette, label: 'Galeria', active: true, special: 'gallery' },
         { id: 'hub', icon: Gamepad2, label: 'Gaming Hub', active: true, special: 'hub' },
         { id: 'forge', icon: Dices, label: 'RPG Forge', active: true, special: true },
         { id: 'news', icon: Megaphone, label: 'Novidades', active: true },
@@ -61,7 +62,7 @@ export function Sidebar({ currentView, onNavigate, unreadCount, currentUser, onL
                         return (
                             <div
                                 key={item.id}
-                                className={`${styles.navItem} ${isActive ? styles.active : ''} ${item.special === 'hub' ? styles.hubItem : ''} ${item.special === true ? styles.forgeItem : ''}`}
+                                className={`${styles.navItem} ${isActive ? styles.active : ''} ${item.special === 'hub' ? styles.hubItem : ''} ${item.special === true ? styles.forgeItem : ''} ${item.special === 'gallery' ? styles.galleryItem : ''}`}
                                 onClick={() => item.active !== false && onNavigate(item.id)}
                             >
                                 <div className={styles.navIconWrapper}>

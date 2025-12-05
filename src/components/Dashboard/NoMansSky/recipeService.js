@@ -10,6 +10,7 @@ import {
     onSnapshot
 } from 'firebase/firestore';
 import { db } from '../../../firebase';
+import { fullRecipes } from './fullRecipes';
 
 const COLLECTION_NAME = 'nms_recipes';
 const INIT_FLAG_KEY = 'nms_recipes_initialized';
@@ -211,4 +212,32 @@ export async function deleteRecipe(recipeId) {
 export function resetInitialization() {
     localStorage.removeItem(INIT_FLAG_KEY);
     console.log('🔄 Flag de inicialização removida');
+}
+
+// Função para popular o banco de dados com todas as receitas
+export async function populateDatabase() {
+    console.log('🚀 Iniciando população do banco de dados...');
+    const recipesRef = collection(db, COLLECTION_NAME);
+
+    // Obter receitas existentes para evitar duplicatas
+    const snapshot = await getDocs(recipesRef);
+    const existingNames = new Set(snapshot.docs.map(doc => doc.data().name));
+
+    let addedCount = 0;
+
+    for (const recipe of fullRecipes) {
+        if (!existingNames.has(recipe.name)) {
+            await addDoc(recipesRef, {
+                ...recipe,
+                createdAt: new Date().toISOString()
+            });
+            addedCount++;
+            console.log(`✅ Adicionada: ${recipe.name}`);
+        } else {
+            // console.log(`⚠️ Já existe: ${recipe.name}`);
+        }
+    }
+
+    console.log(`🏁 População concluída! ${addedCount} novas receitas adicionadas.`);
+    return addedCount;
 }

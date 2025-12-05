@@ -5,7 +5,7 @@ import { CreatePost } from './CreatePost';
 import { PostCard } from './PostCard';
 import styles from './Feed.module.css';
 
-export function Feed({ user, onShowAlert, onShowConfirm, initialPostId, initialCommentId, onUserClick }) {
+export function Feed({ user, onShowAlert, onShowConfirm, initialPostId, initialCommentId, onUserClick, onNavigateToArt }) {
     const [feedMode, setFeedMode] = useState('global'); // 'global' | 'friends'
     const { friends, loading: friendsLoading } = useUserFriends(user.uid);
 
@@ -86,6 +86,7 @@ export function Feed({ user, onShowAlert, onShowConfirm, initialPostId, initialC
                             onShowConfirm={onShowConfirm}
                             targetCommentId={initialPostId === post.id ? initialCommentId : null}
                             onUserClick={onUserClick}
+                            onNavigateToArt={onNavigateToArt}
                         />
                     </div>
                 ))

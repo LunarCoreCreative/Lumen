@@ -4,11 +4,22 @@ import { NMSHub } from './NMSHub';
 import { RecipeList } from './RecipeList';
 import { AddRecipeModal } from './AddRecipeModal';
 import { addRecipe, subscribeToRecipes } from './recipeService';
+import { useIsAdmin } from '../../../hooks/useIsAdmin';
+import { useIsNMSDev } from '../../../hooks/useIsNMSDev';
+import { useIsOwner } from '../../../hooks/useIsOwner';
 
 export function NoMansSky({ user, onBack }) {
     const [currentSection, setCurrentSection] = useState('hub'); // 'hub' | 'recipes'
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [recipeCount, setRecipeCount] = useState(0);
+
+    // Hooks de permissão
+    const { isAdmin } = useIsAdmin(user?.uid);
+    const { isNMSDev } = useIsNMSDev(user?.uid);
+    const { isOwner } = useIsOwner(user);
+
+    // Usuário pode gerenciar se for Owner, Admin ou NMS Dev
+    const canManage = isOwner || isAdmin || isNMSDev;
 
     // Buscar contagem de receitas
     useEffect(() => {
@@ -57,12 +68,10 @@ export function NoMansSky({ user, onBack }) {
                     game={{ ...gameData, description: 'Receitas de refinamento e crafting' }}
                     user={user}
                     onBack={handleBackToHub}
-                    showAddButton={user?.isOwner || user?.isAdmin || user?.isNMSDev}
+                    showAddButton={canManage}
                     onAddContent={handleAddContent}
                 >
-                    <RecipeList
-                        isAdmin={user?.isOwner || user?.isAdmin || user?.isNMSDev}
-                    />
+                    <RecipeList isAdmin={canManage} />
                 </GameView>
 
                 <AddRecipeModal

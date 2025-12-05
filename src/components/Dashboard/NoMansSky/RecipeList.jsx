@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import styles from './NoMansSky.module.css';
 import { RecipeCard } from './RecipeCard';
-import { Loader } from 'lucide-react';
-import { subscribeToRecipes, deleteRecipe, initializeDefaultRecipes } from './recipeService';
+import { Loader, Database } from 'lucide-react';
+import { subscribeToRecipes, deleteRecipe, initializeDefaultRecipes, populateDatabase } from './recipeService';
+import { ResourceDetailModal } from './ResourceDetailModal';
 
 export function RecipeList({ searchQuery = '', showFilters, isAdmin = false }) {
     const [recipes, setRecipes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [sortBy, setSortBy] = useState('name');
+    const [selectedResource, setSelectedResource] = useState(null);
 
     // Carregar receitas do Firebase com listener em tempo real
     useEffect(() => {
@@ -32,6 +34,14 @@ export function RecipeList({ searchQuery = '', showFilters, isAdmin = false }) {
         } catch (error) {
             console.error('Erro ao deletar receita:', error);
             alert('Erro ao deletar receita. Tente novamente.');
+        }
+    };
+
+    const handlePopulate = async () => {
+        if (window.confirm('Deseja popular o banco de dados com receitas padrão? Isso pode levar alguns segundos.')) {
+            setLoading(true);
+            await populateDatabase();
+            // O listener vai atualizar a lista automaticamente
         }
     };
 
@@ -104,6 +114,15 @@ export function RecipeList({ searchQuery = '', showFilters, isAdmin = false }) {
                             <option value="ratio">Eficiência</option>
                         </select>
                     </div>
+
+                    {isAdmin && (
+                        <div className={styles.filterGroup}>
+                            <label className={styles.filterLabel}>Admin</label>
+                            <button className={styles.populateButton} onClick={handlePopulate}>
+                                <Database size={14} /> Popular DB
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -115,6 +134,7 @@ export function RecipeList({ searchQuery = '', showFilters, isAdmin = false }) {
             </div>
 
             {/* Recipe Grid */}
+            {/* Recipe Grid */}
             {sortedRecipes.length > 0 ? (
                 <div className={styles.recipeGrid}>
                     {sortedRecipes.map(recipe => (
@@ -123,6 +143,7 @@ export function RecipeList({ searchQuery = '', showFilters, isAdmin = false }) {
                             recipe={recipe}
                             isAdmin={isAdmin}
                             onDelete={handleDeleteRecipe}
+                            onResourceClick={setSelectedResource}
                         />
                     ))}
                 </div>
@@ -132,6 +153,13 @@ export function RecipeList({ searchQuery = '', showFilters, isAdmin = false }) {
                     <span>Tente ajustar os filtros ou busca</span>
                 </div>
             )}
+
+            <ResourceDetailModal
+                isOpen={!!selectedResource}
+                onClose={() => setSelectedResource(null)}
+                resourceName={selectedResource}
+                allRecipes={recipes}
+            />
         </div>
     );
 }

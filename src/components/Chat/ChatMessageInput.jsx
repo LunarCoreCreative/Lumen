@@ -1,18 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import EmojiPicker from 'emoji-picker-react';
 import { BoldIcon, ItalicIcon, StrikeIcon, CodeIcon, EmojiIcon, FormatIcon } from '../Icons';
-import { Send } from 'lucide-react';
+import { Send, Image as ImageIcon, Loader } from 'lucide-react';
 import styles from './ChatMessageInput.module.css';
 import { CodeEditorDialog } from '../CodeEditorDialog';
 import { RichTextRenderer } from '../RichTextRenderer';
 
-export function ChatMessageInput({ onSend, disabled }) {
+export function ChatMessageInput({ onSend, onImageSelect, onTyping, disabled, sending }) {
     const [message, setMessage] = useState('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [showToolbar, setShowToolbar] = useState(false);
     const [showCodeEditor, setShowCodeEditor] = useState(false);
     const emojiPickerRef = useRef(null);
     const inputRef = useRef(null);
+    const fileInputRef = useRef(null);
+    const typingTimeoutRef = useRef(null);
 
     // Fechar emoji picker ao clicar fora
     useEffect(() => {
@@ -38,6 +40,58 @@ export function ChatMessageInput({ onSend, disabled }) {
             inputRef.current.style.height = Math.min(inputRef.current.scrollHeight, 150) + 'px';
         }
     }, [message]);
+
+    // Cleanup typing timeout
+    useEffect(() => {
+        return () => {
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    // Handler de digitando com debounce
+    const handleInputChange = useCallback((e) => {
+        const newValue = e.target.value;
+        setMessage(newValue);
+
+        // Indicador de digitando
+        if (onTyping) {
+            onTyping(true);
+
+            // Limpar timeout anterior
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+
+            // Definir novo timeout para parar de digitar após 2 segundos
+            typingTimeoutRef.current = setTimeout(() => {
+                onTyping(false);
+            }, 2000);
+        }
+    }, [onTyping]);
+
+    // Handler para colar imagens do clipboard (Ctrl+V com print)
+    const handlePaste = useCallback((e) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
+            // Verificar se é uma imagem
+            if (item.type.startsWith('image/')) {
+                e.preventDefault(); // Previne colar texto da imagem
+
+                const file = item.getAsFile();
+                if (file && onImageSelect) {
+                    onImageSelect(file);
+                }
+                return; // Só processa a primeira imagem
+            }
+        }
+        // Se não for imagem, deixa o comportamento padrão (colar texto)
+    }, [onImageSelect]);
 
     const insertFormat = (prefix, suffix) => {
         const textarea = inputRef.current;
@@ -90,11 +144,33 @@ export function ChatMessageInput({ onSend, disabled }) {
         setShowEmojiPicker(false);
     };
 
+    const handleImageClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files?.[0];
+        if (file && onImageSelect) {
+            onImageSelect(file);
+        }
+        // Reset input para permitir selecionar o mesmo arquivo novamente
+        e.target.value = '';
+    };
+
     const handleSubmit = () => {
-        if (message.trim() && !disabled) {
+        if ((message.trim() || sending === false) && !disabled) {
             onSend(message);
             setMessage('');
             setShowEmojiPicker(false);
+
+            // Parar indicador de digitando
+            if (onTyping) {
+                onTyping(false);
+            }
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+
             if (inputRef.current) {
                 inputRef.current.style.height = 'auto';
             }
@@ -151,6 +227,22 @@ export function ChatMessageInput({ onSend, disabled }) {
                             <FormatIcon size={20} />
                         </button>
 
+                        <button
+                            className={styles.actionBtn}
+                            onClick={handleImageClick}
+                            title="Enviar imagem"
+                            disabled={disabled}
+                        >
+                            <ImageIcon size={20} />
+                        </button>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            style={{ display: 'none' }}
+                        />
+
                         <div className={styles.emojiWrapper} ref={emojiPickerRef}>
                             <button
                                 className={styles.actionBtn}
@@ -179,10 +271,11 @@ export function ChatMessageInput({ onSend, disabled }) {
                     <textarea
                         ref={inputRef}
                         className={styles.messageInput}
-                        placeholder="Digite sua mensagem..."
+                        placeholder="Digite sua mensagem... (Ctrl+V para colar imagem)"
                         value={message}
-                        onChange={(e) => setMessage(e.target.value)}
+                        onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
+                        onPaste={handlePaste}
                         rows={1}
                         disabled={disabled}
                     />
@@ -191,10 +284,14 @@ export function ChatMessageInput({ onSend, disabled }) {
                     <button
                         className={styles.sendBtn}
                         onClick={handleSubmit}
-                        disabled={!message.trim() || disabled}
+                        disabled={(!message.trim() && !sending) || disabled}
                         title="Enviar"
                     >
-                        <Send size={20} />
+                        {sending ? (
+                            <Loader size={20} className={styles.spinLoader} />
+                        ) : (
+                            <Send size={20} />
+                        )}
                     </button>
                 </div>
             </div>

@@ -3,7 +3,7 @@ import styles from './NoMansSky.module.css';
 import { Clock, TrendingUp, ArrowRight, Trash2, Package } from 'lucide-react';
 import { ConfirmDialog } from '../../ConfirmDialog/ConfirmDialog';
 
-export function RecipeCard({ recipe, isAdmin, onDelete }) {
+export function RecipeCard({ recipe, isAdmin, onDelete, onResourceClick }) {
     const [showConfirm, setShowConfirm] = useState(false);
 
     const calculateRatio = () => {
@@ -32,7 +32,11 @@ export function RecipeCard({ recipe, isAdmin, onDelete }) {
     const handleCancelDelete = () => setShowConfirm(false);
 
     const MaterialItem = ({ material, quantity, icon }) => (
-        <div className={styles.materialItem}>
+        <div
+            className={styles.materialItem}
+            style={onResourceClick ? { cursor: 'pointer' } : {}}
+            onClick={() => onResourceClick && onResourceClick(material)}
+        >
             <div className={styles.materialIcon}>
                 {icon ? (
                     <img src={icon} alt={material} />

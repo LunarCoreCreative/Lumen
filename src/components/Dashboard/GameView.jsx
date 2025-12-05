@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styles from './GameView.module.css';
 import { ArrowLeft, Search, Filter, Plus, Sparkles, Rocket } from 'lucide-react';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
+import { useIsNMSDev } from '../../hooks/useIsNMSDev';
 
 export function GameView({
     game,
@@ -13,7 +14,12 @@ export function GameView({
 }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [showFilters, setShowFilters] = useState(false);
-    const { isAdmin, loading } = useIsAdmin(user?.uid);
+    const { isAdmin, loading: adminLoading } = useIsAdmin(user?.uid);
+    const { isNMSDev, loading: nmsDevLoading } = useIsNMSDev(user?.uid);
+
+    // NMS Dev tem permissões de gerenciamento para jogos do hub
+    const canManage = isAdmin || isNMSDev;
+    const loading = adminLoading || nmsDevLoading;
 
     return (
         <div className={styles.gameViewContainer}>
@@ -86,7 +92,7 @@ export function GameView({
                         <span>Filtros</span>
                     </button>
 
-                    {!loading && isAdmin && showAddButton && onAddContent && (
+                    {!loading && canManage && showAddButton && onAddContent && (
                         <button
                             className={styles.addBtn}
                             onClick={onAddContent}
@@ -102,7 +108,7 @@ export function GameView({
             {/* Content Area */}
             <main className={styles.content}>
                 {React.Children.map(children, child =>
-                    React.cloneElement(child, { searchQuery, showFilters, isAdmin, gameColor: game.color })
+                    React.cloneElement(child, { searchQuery, showFilters, isAdmin: canManage, gameColor: game.color })
                 )}
             </main>
         </div>

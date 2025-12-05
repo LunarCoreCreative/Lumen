@@ -10,6 +10,11 @@ import { useUserData } from '../../hooks/useUserData';
 import { useFriendship } from '../../hooks/useFriendship';
 import { useUserFriends } from '../../hooks/useUserFriends';
 import { auth } from '../../firebase';
+import {
+    FileText, MessageSquare, Users, ArrowLeft, Pencil,
+    Camera, UserPlus, UserMinus, UserCheck, Clock, Check, X,
+    MapPin, Calendar, Link as LinkIcon, Gamepad2
+} from 'lucide-react';
 
 export function UserProfile({ user: authUser, onBack, onNavigateToPost, onUserClick }) {
     const [activeTab, setActiveTab] = useState('posts');
@@ -35,23 +40,23 @@ export function UserProfile({ user: authUser, onBack, onNavigateToPost, onUserCl
             case 'none':
                 return (
                     <button onClick={sendFriendRequest} className={styles.friendButton}>
-                        Adicionar Amigo
+                        <UserPlus size={16} /> Adicionar Amigo
                     </button>
                 );
             case 'pending_sent':
                 return (
                     <button onClick={cancelFriendRequest} className={`${styles.friendButton} ${styles.pending}`}>
-                        Solicitação Enviada (Cancelar)
+                        <Clock size={16} /> Solicitação Enviada
                     </button>
                 );
             case 'pending_received':
                 return (
                     <div className={styles.friendActions}>
                         <button onClick={acceptFriendRequest} className={`${styles.friendButton} ${styles.accept}`}>
-                            Aceitar
+                            <Check size={16} /> Aceitar
                         </button>
                         <button onClick={rejectFriendRequest} className={`${styles.friendButton} ${styles.reject}`}>
-                            Recusar
+                            <X size={16} /> Recusar
                         </button>
                     </div>
                 );
@@ -62,7 +67,7 @@ export function UserProfile({ user: authUser, onBack, onNavigateToPost, onUserCl
                             onClick={() => setShowUnfriendModal(true)}
                             className={`${styles.friendButton} ${styles.friends}`}
                         >
-                            Amigos (Desfazer)
+                            <UserCheck size={16} /> Amigos
                         </button>
 
                         <ConfirmationModal
@@ -179,17 +184,18 @@ export function UserProfile({ user: authUser, onBack, onNavigateToPost, onUserCl
 
                 <div className={styles.headerControls}>
                     <button onClick={onBack} className={styles.backButton}>
-                        ← Voltar
+                        <ArrowLeft size={16} /> Voltar
                     </button>
                     {isOwner && !isEditing && (
                         <button onClick={() => setIsEditing(true)} className={styles.editButton}>
-                            ✏️ Editar Perfil
+                            <Pencil size={16} /> Editar Perfil
                         </button>
                     )}
 
                     {isEditing && (
                         <label className={styles.bannerEditButton}>
-                            <span>📷 Alterar Capa</span>
+                            <Camera size={16} />
+                            <span>Alterar Capa</span>
                             <input
                                 type="file"
                                 accept="image/*"
@@ -205,7 +211,7 @@ export function UserProfile({ user: authUser, onBack, onNavigateToPost, onUserCl
                         {renderAvatar()}
                         {isEditing && (
                             <label className={`${styles.uploadOverlay} ${styles.avatarOverlay}`}>
-                                <span>📷</span>
+                                <Camera size={28} />
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -285,6 +291,7 @@ export function UserProfile({ user: authUser, onBack, onNavigateToPost, onUserCl
                             className={`${styles.statItem} ${activeTab === 'posts' ? styles.activeStat : ''}`}
                             onClick={() => setActiveTab('posts')}
                         >
+                            <FileText size={20} className={styles.statIcon} />
                             <span className={styles.statValue}>{postsLoading ? '-' : posts.length}</span>
                             <span className={styles.statLabel}>Posts</span>
                         </div>
@@ -292,6 +299,7 @@ export function UserProfile({ user: authUser, onBack, onNavigateToPost, onUserCl
                             className={`${styles.statItem} ${activeTab === 'comments' ? styles.activeStat : ''}`}
                             onClick={() => setActiveTab('comments')}
                         >
+                            <MessageSquare size={20} className={styles.statIcon} />
                             <span className={styles.statValue}>{commentsLoading ? '-' : comments.length}</span>
                             <span className={styles.statLabel}>Comentários</span>
                         </div>
@@ -299,6 +307,7 @@ export function UserProfile({ user: authUser, onBack, onNavigateToPost, onUserCl
                             className={`${styles.statItem} ${activeTab === 'friends' ? styles.activeStat : ''}`}
                             onClick={() => setActiveTab('friends')}
                         >
+                            <Users size={20} className={styles.statIcon} />
                             <span className={styles.statValue}>{friendsLoading ? '-' : friends.length}</span>
                             <span className={styles.statLabel}>Amigos</span>
                         </div>
@@ -311,19 +320,19 @@ export function UserProfile({ user: authUser, onBack, onNavigateToPost, onUserCl
                     className={`${styles.tabButton} ${activeTab === 'posts' ? styles.activeTab : ''}`}
                     onClick={() => setActiveTab('posts')}
                 >
-                    Posts
+                    <FileText size={16} /> Posts
                 </button>
                 <button
                     className={`${styles.tabButton} ${activeTab === 'comments' ? styles.activeTab : ''}`}
                     onClick={() => setActiveTab('comments')}
                 >
-                    Comentários
+                    <MessageSquare size={16} /> Comentários
                 </button>
                 <button
                     className={`${styles.tabButton} ${activeTab === 'friends' ? styles.activeTab : ''}`}
                     onClick={() => setActiveTab('friends')}
                 >
-                    Amigos
+                    <Users size={16} /> Amigos
                 </button>
             </div>
 
