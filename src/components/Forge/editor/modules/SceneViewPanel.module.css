@@ -1,0 +1,338 @@
+/* ============================================
+   SCENE VIEW PANEL - Unity Style
+   ============================================ */
+
+.sceneView {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #0a0a0e;
+    overflow: hidden;
+}
+
+/* Header / Mini Toolbar */
+.header {
+    height: 28px;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #19191f;
+    border-bottom: 1px solid #1e1e26;
+    flex-shrink: 0;
+}
+
+.headerLeft,
+.headerRight {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.headerBtn {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.12s;
+}
+
+.headerBtn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #999;
+}
+
+.headerBtn.active {
+    background: rgba(139, 92, 246, 0.2);
+    color: #a78bfa;
+}
+
+.divider {
+    width: 1px;
+    height: 14px;
+    background: #2a2a35;
+    margin: 0 4px;
+}
+
+.zoomLabel {
+    font-size: 0.65rem;
+    color: #555;
+    width: 36px;
+    text-align: center;
+    font-family: monospace;
+}
+
+/* Canvas Container */
+.canvasContainer {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background:
+        radial-gradient(circle at center, #12121a 0%, #0a0a0e 100%);
+}
+
+.canvasContainer.dragOver {
+    background: rgba(139, 92, 246, 0.05);
+    outline: 2px dashed rgba(139, 92, 246, 0.4);
+    outline-offset: -4px;
+}
+
+/* Canvas */
+.canvas {
+    position: relative;
+    width: 1200px;
+    height: 800px;
+    background: #12121a;
+    border: 1px solid #2a2a35;
+    transform-origin: 0 0;
+    box-shadow:
+        0 0 80px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(139, 92, 246, 0.05);
+}
+
+.canvas.showGrid {
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 10px 10px;
+    background-color: #12121a;
+}
+
+/* Empty State */
+.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px;
+    color: #444;
+    text-align: center;
+}
+
+.empty span {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #555;
+}
+
+.empty p {
+    font-size: 0.8rem;
+    color: #444;
+    margin: 0;
+    max-width: 280px;
+}
+
+.empty button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    color: #a78bfa;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.15s;
+}
+
+.empty button:hover {
+    background: rgba(139, 92, 246, 0.25);
+    border-color: rgba(139, 92, 246, 0.5);
+    transform: translateY(-1px);
+}
+
+/* Widget on Canvas */
+.widget {
+    position: absolute;
+    transition: box-shadow 0.1s;
+    user-select: none;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.widget:hover:not(.selected) {
+    box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.4);
+}
+
+.widget.selected {
+    box-shadow:
+        0 0 0 2px #8b5cf6,
+        0 0 20px rgba(139, 92, 246, 0.25);
+    z-index: 100;
+}
+
+/* Generic Widget */
+.genericWidget {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: #555;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    font-size: 0.7rem;
+}
+
+/* Resize Handles */
+.handle {
+    position: absolute;
+    background: #8b5cf6;
+    border: 1px solid #fff;
+    z-index: 101;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.widget.selected .handle {
+    opacity: 1;
+}
+
+.handleN,
+.handleS {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 5px;
+    cursor: ns-resize;
+    border-radius: 2px;
+}
+
+.handleE,
+.handleW {
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 16px;
+    cursor: ew-resize;
+    border-radius: 2px;
+}
+
+.handleN {
+    top: -3px;
+}
+
+.handleS {
+    bottom: -3px;
+}
+
+.handleE {
+    right: -3px;
+}
+
+.handleW {
+    left: -3px;
+}
+
+.handleNW,
+.handleNE,
+.handleSW,
+.handleSE {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+}
+
+.handleNW {
+    top: -4px;
+    left: -4px;
+    cursor: nwse-resize;
+}
+
+.handleNE {
+    top: -4px;
+    right: -4px;
+    cursor: nesw-resize;
+}
+
+.handleSW {
+    bottom: -4px;
+    left: -4px;
+    cursor: nesw-resize;
+}
+
+.handleSE {
+    bottom: -4px;
+    right: -4px;
+    cursor: nwse-resize;
+}
+
+/* Selection Info Overlay */
+.selectionInfo {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #888;
+    font-size: 0.7rem;
+    font-family: monospace;
+    pointer-events: none;
+}
+
+
+/* Custom Scrollbar */
+/* Coordinates display */
+.coordinates {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 3px;
+    color: #666;
+    font-size: 0.65rem;
+    font-family: monospace;
+    pointer-events: none;
+}
+
+/* Custom Scrollbar */
+.customScroll {
+    /* Variáveis padrão caso não sejam definidas inline */
+    --sb-thumb-color: rgba(255, 255, 255, 0.3);
+}
+
+.customScroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.customScroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.customScroll::-webkit-scrollbar-thumb {
+    background-color: var(--sb-thumb-color);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+.customScroll::-webkit-scrollbar-corner {
+    background: transparent;
+}

@@ -1,0 +1,359 @@
+/* ============================================
+   HIERARCHY PANEL - Unity Style
+   ============================================ */
+
+.hierarchy {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #111116;
+    user-select: none;
+}
+
+/* Header */
+.header {
+    height: 28px;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #19191f;
+    border-bottom: 1px solid #1e1e26;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+}
+
+.addBtn {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.12s;
+}
+
+.addBtn:hover {
+    background: rgba(139, 92, 246, 0.2);
+    color: #a78bfa;
+}
+
+/* Content */
+.content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 4px 0;
+}
+
+/* Empty State */
+.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 30px 20px;
+    color: #444;
+    text-align: center;
+}
+
+.empty span {
+    font-size: 0.8rem;
+}
+
+.empty button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    color: #a78bfa;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.12s;
+}
+
+.empty button:hover {
+    background: rgba(139, 92, 246, 0.25);
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
+/* Scene Container */
+.sceneContainer {
+    margin-bottom: 2px;
+}
+
+.sceneRow {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: #8b8b8b;
+    transition: all 0.1s;
+    border-left: 2px solid transparent;
+}
+
+.sceneRow:hover {
+    background: rgba(255, 255, 255, 0.03);
+    color: #b0b0b0;
+}
+
+.sceneRow.selected {
+    background: rgba(139, 92, 246, 0.12);
+    color: #a78bfa;
+    border-left-color: #8b5cf6;
+}
+
+.sceneIcon {
+    color: #8b5cf6;
+    flex-shrink: 0;
+}
+
+.sceneName {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sceneChildren {
+    position: relative;
+}
+
+/* Tree Lines */
+.sceneChildren::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 10px;
+    width: 1px;
+    background: #2a2a35;
+}
+
+/* Node Container */
+.nodeContainer {
+    position: relative;
+}
+
+.nodeRow {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    color: #777;
+    transition: all 0.1s;
+    border-left: 2px solid transparent;
+    position: relative;
+}
+
+.nodeRow:hover {
+    background: rgba(255, 255, 255, 0.03);
+    color: #a0a0a0;
+}
+
+.nodeRow.selected {
+    background: rgba(139, 92, 246, 0.1);
+    color: #c4b5fd;
+    border-left-color: #8b5cf6;
+}
+
+/* Prefab Instance - Blue color like Unity */
+.nodeRow.prefabInstance {
+    color: #60a5fa;
+}
+
+.nodeRow.prefabInstance .nodeIcon {
+    color: #3b82f6;
+}
+
+.nodeRow.prefabInstance.selected {
+    background: rgba(59, 130, 246, 0.15);
+    color: #93c5fd;
+    border-left-color: #3b82f6;
+}
+
+/* Drag & Drop States */
+.nodeRow.dropBefore {
+    box-shadow: inset 0 2px 0 #3b82f6;
+}
+
+.nodeRow.dropAfter {
+    box-shadow: inset 0 -2px 0 #3b82f6;
+}
+
+.nodeRow.dropInside {
+    background: rgba(59, 130, 246, 0.15) !important;
+    outline: 1px dashed #3b82f6;
+    outline-offset: -1px;
+}
+
+/* Horizontal tree line connector */
+.nodeRow::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    width: 8px;
+    height: 1px;
+    background: #2a2a35;
+}
+
+.nodeChildren {
+    position: relative;
+}
+
+.nodeChildren::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 10px;
+    width: 1px;
+    background: #2a2a35;
+}
+
+/* Expand Button */
+.expandBtn {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    border-radius: 2px;
+    transition: all 0.1s;
+}
+
+.expandBtn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #999;
+}
+
+.nodeIcon {
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.nodeName {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Rename Input */
+.renameInput {
+    flex: 1;
+    padding: 2px 4px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #8b5cf6;
+    border-radius: 2px;
+    color: #fff;
+    font-size: 0.78rem;
+    font-family: inherit;
+    outline: none;
+}
+
+/* Context Menu */
+.contextMenu {
+    position: fixed;
+    min-width: 160px;
+    background: #1e1e28;
+    border: 1px solid #333;
+    border-radius: 6px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    padding: 4px;
+    animation: menuIn 0.1s ease-out;
+}
+
+@keyframes menuIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.menuLabel {
+    padding: 6px 10px;
+    font-size: 0.65rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.contextMenu button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 10px;
+    background: none;
+    border: none;
+    color: #bbb;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 3px;
+    text-align: left;
+    transition: all 0.1s;
+}
+
+.contextMenu button:hover {
+    background: rgba(139, 92, 246, 0.15);
+    color: #fff;
+}
+
+.contextMenu button.danger:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.menuDivider {
+    height: 1px;
+    background: #333;
+    margin: 4px 0;
+}
+
+/* Scrollbar */
+.content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.content::-webkit-scrollbar-thumb {
+    background: #2a2a35;
+    border-radius: 3px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+    background: #3a3a45;
+}

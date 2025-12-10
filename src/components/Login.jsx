@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import './Login.css';
-import { auth, googleProvider } from '../firebase';
+import { auth, googleProvider, db } from '../firebase';
 import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, sendPasswordResetEmail, fetchSignInMethodsForEmail } from 'firebase/auth';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { Toast } from './Toast';
 import packageJson from '../../package.json';
+
 
 export function Login() {
     const [isLogin, setIsLogin] = useState(true);
@@ -49,11 +51,46 @@ export function Login() {
 
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                // Atualizar nome do usuário
-                await updateProfile(userCredential.user, { displayName: name });
+                const user = userCredential.user;
+
+                // Atualizar nome do usuário no Auth
+                await updateProfile(user, { displayName: name });
+
+                // BUGFIX: Criar documento no Firestore para o usuário
+                // Isso garante que o usuário apareça no admin panel e tenha dados completos
+                const userDocRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userDocRef);
+
+                if (!userDoc.exists()) {
+                    await setDoc(userDocRef, {
+                        displayName: name,
+                        email: user.email,
+                        photoURL: user.photoURL || null,
+                        bio: '',
+                        bannerURL: '',
+                        isAdmin: false,
+                        isOwner: false,
+                        isBanned: false,
+                        createdAt: serverTimestamp(),
+                        lastLogin: serverTimestamp(),
+                        settings: {
+                            notifications: {
+                                likes: true,
+                                comments: true,
+                                messages: true,
+                                mentions: true
+                            },
+                            privacy: {
+                                showOnline: true,
+                                allowMessages: true
+                            }
+                        }
+                    });
+                }
 
                 showToast(`Conta criada com sucesso para ${name}!`, 'success');
                 setIsLogin(true); // Mudar para tela de login ou logar direto
+
             } catch (error) {
                 console.error(error);
                 if (error.code === 'auth/email-already-in-use') {
@@ -114,6 +151,42 @@ export function Login() {
             googleProvider.setCustomParameters({ prompt: 'select_account' });
             const result = await signInWithPopup(auth, googleProvider);
             const user = result.user;
+
+            // BUGFIX: Criar/atualizar documento no Firestore
+            const userDocRef = doc(db, 'users', user.uid);
+            const userDoc = await getDoc(userDocRef);
+
+            if (!userDoc.exists()) {
+                // Primeiro login - criar documento completo
+                await setDoc(userDocRef, {
+                    displayName: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL || null,
+                    bio: '',
+                    bannerURL: '',
+                    isAdmin: false,
+                    isOwner: false,
+                    isBanned: false,
+                    createdAt: serverTimestamp(),
+                    lastLogin: serverTimestamp(),
+                    settings: {
+                        notifications: {
+                            likes: true,
+                            comments: true,
+                            messages: true,
+                            mentions: true
+                        },
+                        privacy: {
+                            showOnline: true,
+                            allowMessages: true
+                        }
+                    }
+                });
+            } else {
+                // Login subsequente - atualizar lastLogin
+                await setDoc(userDocRef, { lastLogin: serverTimestamp() }, { merge: true });
+            }
+
             showToast(`Bem-vindo, ${user.displayName}! Login com Google realizado.`, 'success');
         } catch (error) {
             console.error(error);

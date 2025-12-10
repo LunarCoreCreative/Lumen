@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styles from './ForgeHub.module.css';
 import { Dices, Scroll, Map, Swords, Sparkles, TrendingUp, Zap, Shield, BookOpen, Users, Crown } from 'lucide-react';
 import { MastersArea } from './MastersArea';
+import { PlayerArea } from './PlayerArea';
 
 export function ForgeHub({ user }) {
     const [editorView, setEditorView] = useState(null); // null | 'masters' | 'characters' | etc
@@ -9,6 +10,10 @@ export function ForgeHub({ user }) {
     // Se estiver em uma view específica, renderiza o componente apropriado
     if (editorView === 'masters') {
         return <MastersArea user={user} onBack={() => setEditorView(null)} />;
+    }
+
+    if (editorView === 'characters') {
+        return <PlayerArea user={user} onBack={() => setEditorView(null)} />;
     }
 
     // Mock de estatísticas (para versão futura com dados reais)
@@ -40,8 +45,9 @@ export function ForgeHub({ user }) {
             color: '#3b82f6',
             gradient: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
             accentColor: '#60a5fa',
-            comingSoon: true,
-            pattern: 'lines'
+            comingSoon: false,
+            pattern: 'lines',
+            onClick: () => setEditorView('characters')
         },
         {
             id: 'campaigns',

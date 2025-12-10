@@ -1,351 +1,195 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styles from './MastersArea.module.css';
-import { Plus, BookOpen, Crown, TrendingUp, Users, Search, Filter, Download, Share2, Edit, Trash2, Copy } from 'lucide-react';
-import { SystemEditor } from './SystemEditor/SystemEditor';
-import { db } from '../../firebase';
-import { collection, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
-import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog';
+import { ArrowLeft, Crown, Plus, FileText, Play, Wrench, X, Sparkles } from 'lucide-react';
+import { SystemEditorV2 } from './editor/SystemEditorV2';
+import { SYSTEM_TEMPLATES, getTemplateById } from './data/systemTemplates';
 
+/**
+ * MastersArea - Área dos Mestres
+ * 
+ * Hub para gerenciar sistemas de RPG criados pelo usuário.
+ */
 export function MastersArea({ user, onBack }) {
-    const [view, setView] = useState('list'); // 'list' | 'editor' | 'community'
+    const [view, setView] = useState('list'); // 'list' | 'editor' | 'diagnostics'
+    const [systems, setSystems] = useState([]);
     const [editingSystem, setEditingSystem] = useState(null);
-    const [userSystems, setUserSystems] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
+    const [showTemplateModal, setShowTemplateModal] = useState(false);
 
-    // Buscar sistemas do usuário no Firebase
-    useEffect(() => {
-        if (!user?.uid) return;
-
-        const q = query(
-            collection(db, 'rpgSystems'),
-            where('createdBy', '==', user.uid)
-        );
-
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const systems = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            setUserSystems(systems);
-            setLoading(false);
-        });
-
-        return () => unsubscribe();
-    }, [user]);
-
-    const stats = {
-        systemsCreated: userSystems.length,
-        totalUsers: userSystems.reduce((acc, sys) => acc + (sys.users || 0), 0),
-        publicSystems: userSystems.filter(s => s.isPublic).length,
-        drafts: userSystems.filter(s => !s.isPublic).length
+    // Criar novo sistema - abre modal de templates
+    const handleCreateSystem = () => {
+        setShowTemplateModal(true);
     };
 
-    if (view === 'editor') {
-        return (
-            <SystemEditor
-                user={user}
-                systemId={editingSystem?.id}
-                initialData={editingSystem}
-                onBack={() => {
-                    setView('list');
-                    setEditingSystem(null);
-                }}
-            />
-        );
-    }
-
-    const handleCreateNew = () => {
-        setEditingSystem(null);
+    // Selecionar template e abrir editor
+    const handleSelectTemplate = (templateId) => {
+        if (templateId === 'blank') {
+            setEditingSystem(null);
+        } else {
+            const templateData = getTemplateById(templateId);
+            if (templateData) {
+                setEditingSystem({
+                    ...templateData,
+                    id: null,
+                    metadata: {
+                        ...templateData.metadata,
+                        name: `Meu ${templateData.metadata?.name || 'Sistema'}`
+                    }
+                });
+            }
+        }
+        setShowTemplateModal(false);
         setView('editor');
     };
 
-    const getTimeAgo = (date) => {
-        const seconds = Math.floor((new Date() - date) / 1000);
-
-        let interval = seconds / 31536000;
-        if (interval > 1) return Math.floor(interval) + ' ano' + (Math.floor(interval) > 1 ? 's' : '');
-
-        interval = seconds / 2592000;
-        if (interval > 1) return Math.floor(interval) + ' mês' + (Math.floor(interval) > 1 ? 'es' : '');
-
-        interval = seconds / 86400;
-        if (interval > 1) return Math.floor(interval) + ' dia' + (Math.floor(interval) > 1 ? 's' : '');
-
-        interval = seconds / 3600;
-        if (interval > 1) return Math.floor(interval) + ' hora' + (Math.floor(interval) > 1 ? 's' : '');
-
-        interval = seconds / 60;
-        if (interval > 1) return Math.floor(interval) + ' min';
-
-        return 'Agora';
-    };
-
+    // Editar sistema existente
     const handleEditSystem = (system) => {
         setEditingSystem(system);
         setView('editor');
     };
 
-    const handleDeleteSystem = async (systemId) => {
-        setConfirmDialog({
-            isOpen: true,
-            title: 'Deletar Sistema',
-            message: 'Tem certeza que deseja deletar este sistema? Esta ação não pode ser desfeita.',
-            onConfirm: async () => {
-                try {
-                    await deleteDoc(doc(db, 'rpgSystems', systemId));
-                    console.log('✅ Sistema deletado:', systemId);
-                } catch (error) {
-                    console.error('❌ Erro ao deletar sistema:', error);
-                    alert('Erro ao deletar sistema. Tente novamente.');
-                }
-                setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: null });
-            }
-        });
+    // Salvar sistema
+    const handleSaveSystem = async (systemData) => {
+        // TODO: Integrar com Firestore
+        console.log('Salvando sistema:', systemData);
+
+        if (editingSystem?.id) {
+            setSystems(prev => prev.map(s => s.id === editingSystem.id ? systemData : s));
+        } else {
+            const newSystem = { ...systemData, id: `sys_${Date.now()}` };
+            setSystems(prev => [...prev, newSystem]);
+        }
+
+        setView('list');
     };
 
-    return (
-        <div className={styles.mastersArea}>
-            {/* Animated Background */}
-            <div className={styles.bgAnimated}>
-                <div className={styles.bgGradient1}></div>
-                <div className={styles.bgGradient2}></div>
-            </div>
+    // Voltar para lista
+    const handleBackToList = () => {
+        setView('list');
+        setEditingSystem(null);
+    };
 
-            <div className={styles.content}>
-                {/* Header */}
-                <div className={styles.header}>
-                    <button className={styles.backButton} onClick={onBack}>
-                        ← Voltar ao Hub
-                    </button>
-
-                    <div className={styles.headerContent}>
-                        <div className={styles.headerIcon}>
-                            <Crown size={48} />
-                        </div>
-                        <div>
-                            <h1 className={styles.title}>Área dos Mestres</h1>
-                            <p className={styles.subtitle}>Gerencie seus sistemas de RPG e campanhas</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Stats Cards */}
-                <div className={styles.statsGrid}>
-                    <div className={styles.statCard}>
-                        <div className={styles.statIcon}>📚</div>
-                        <div className={styles.statValue}>{stats.systemsCreated}</div>
-                        <div className={styles.statLabel}>Sistemas Criados</div>
-                    </div>
-                    <div className={styles.statCard}>
-                        <div className={styles.statIcon}>👥</div>
-                        <div className={styles.statValue}>{stats.totalUsers}</div>
-                        <div className={styles.statLabel}>Mestres Usando</div>
-                    </div>
-                    <div className={styles.statCard}>
-                        <div className={styles.statIcon}>🌐</div>
-                        <div className={styles.statValue}>{stats.publicSystems}</div>
-                        <div className={styles.statLabel}>Públicos</div>
-                    </div>
-                    <div className={styles.statCard}>
-                        <div className={styles.statIcon}>📝</div>
-                        <div className={styles.statValue}>{stats.drafts}</div>
-                        <div className={styles.statLabel}>Rascunhos</div>
-                    </div>
-                </div>
-
-                {/* Quick Actions */}
-                <div className={styles.quickActions}>
-                    <button className={styles.primaryAction} onClick={handleCreateNew}>
-                        <Plus size={20} />
-                        <span>Criar Novo Sistema</span>
-                    </button>
-                    <button className={styles.secondaryAction}>
-                        <BookOpen size={20} />
-                        <span>Biblioteca Comunitária</span>
-                    </button>
-                    <button className={styles.secondaryAction}>
-                        <Download size={20} />
-                        <span>Importar JSON</span>
-                    </button>
-                </div>
-
-                {/* Systems List */}
-                <div className={styles.systemsSection}>
-                    <div className={styles.sectionHeader}>
-                        <h2 className={styles.sectionTitle}>Meus Sistemas</h2>
-                        <div className={styles.sectionActions}>
-                            <button className={styles.iconButton}>
-                                <Search size={18} />
-                            </button>
-                            <button className={styles.iconButton}>
-                                <Filter size={18} />
-                            </button>
-                        </div>
-                    </div>
-
-                    {userSystems.length === 0 ? (
-                        <div className={styles.emptyState}>
-                            <div className={styles.emptyIcon}>🎲</div>
-                            <h3>Nenhum sistema criado ainda</h3>
-                            <p>Comece criando seu primeiro sistema de RPG personalizado!</p>
-                            <button className={styles.emptyButton} onClick={handleCreateNew}>
-                                <Plus size={20} />
-                                Criar Primeiro Sistema
-                            </button>
-                        </div>
-                    ) : (
-                        <div className={styles.systemsGrid}>
-                            {userSystems.map((system, index) => {
-                                const attrCount = system.attributes?.length || 0;
-                                const updatedDate = system.updatedAt?.toDate?.() || new Date();
-                                const timeAgo = getTimeAgo(updatedDate);
-
-                                return (
-                                    <div
-                                        key={system.id}
-                                        className={styles.systemCard}
-                                        style={{
-                                            animationDelay: `${index * 0.1}s`
-                                        }}
-                                    >
-                                        {/* Card Glow Background */}
-                                        <div className={styles.cardGlow}></div>
-
-                                        {/* System Header com Icon e Badge */}
-                                        <div className={styles.systemHeader}>
-                                            <div className={styles.systemIconWrapper}>
-                                                <div className={styles.systemIcon}>
-                                                    {system.metadata?.icon || system.icon || '🎲'}
-                                                </div>
-                                                <div className={styles.iconGlow}></div>
-                                            </div>
-
-                                            <div className={styles.systemBadge}>
-                                                {system.isPublic ? (
-                                                    <>
-                                                        <div className={styles.badgeIcon}>🌐</div>
-                                                        <span>Público</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <div className={styles.badgeIcon}>🔒</div>
-                                                        <span>Privado</span>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* System Content */}
-                                        <div className={styles.systemContent}>
-                                            <h3 className={styles.systemName}>
-                                                {system.metadata?.name || system.name || 'Sistema Sem Nome'}
-                                            </h3>
-                                            <p className={styles.systemDesc}>
-                                                {system.metadata?.description || system.description || 'Descrição não disponível'}
-                                            </p>
-
-                                            {/* Stats Grid */}
-                                            <div className={styles.systemStats}>
-                                                <div className={styles.statItem}>
-                                                    <div className={styles.statIcon}>⚡</div>
-                                                    <div className={styles.statContent}>
-                                                        <div className={styles.statValue}>{attrCount}</div>
-                                                        <div className={styles.statLabel}>Atributos</div>
-                                                    </div>
-                                                </div>
-
-                                                <div className={styles.statItem}>
-                                                    <div className={styles.statIcon}>🎯</div>
-                                                    <div className={styles.statContent}>
-                                                        <div className={styles.statValue}>
-                                                            {system.metadata?.complexity || system.complexity || 'Média'}
-                                                        </div>
-                                                        <div className={styles.statLabel}>Complexidade</div>
-                                                    </div>
-                                                </div>
-
-                                                <div className={styles.statItem}>
-                                                    <div className={styles.statIcon}>🕐</div>
-                                                    <div className={styles.statContent}>
-                                                        <div className={styles.statValue}>{timeAgo}</div>
-                                                        <div className={styles.statLabel}>Atualizado</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* System Actions */}
-                                        <div className={styles.systemActions}>
-                                            <button
-                                                className={`${styles.actionButton} ${styles.primaryAction}`}
-                                                onClick={() => handleEditSystem(system)}
-                                                title="Editar sistema"
-                                            >
-                                                <Edit size={16} />
-                                                <span>Editar</span>
-                                            </button>
-                                            <button
-                                                className={styles.actionButton}
-                                                title="Clonar sistema"
-                                            >
-                                                <Copy size={16} />
-                                            </button>
-                                            <button
-                                                className={styles.actionButton}
-                                                title="Compartilhar sistema"
-                                            >
-                                                <Share2 size={16} />
-                                            </button>
-                                            <button
-                                                className={styles.actionButtonDanger}
-                                                onClick={() => handleDeleteSystem(system.id)}
-                                                title="Deletar sistema"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
-
-                {/* Templates Section */}
-                <div className={styles.templatesSection}>
-                    <h2 className={styles.sectionTitle}>Templates Rápidos</h2>
-                    <div className={styles.templatesGrid}>
-                        <div className={styles.templateCard}>
-                            <div className={styles.templateIcon}>⚔️</div>
-                            <div className={styles.templateName}>D&D Like</div>
-                            <div className={styles.templateDesc}>Sistema baseado em d20</div>
-                            <button className={styles.templateButton}>Usar Template</button>
-                        </div>
-                        <div className={styles.templateCard}>
-                            <div className={styles.templateIcon}>🎭</div>
-                            <div className={styles.templateName}>FATE Like</div>
-                            <div className={styles.templateDesc}>Narrativo com aspectos</div>
-                            <button className={styles.templateButton}>Usar Template</button>
-                        </div>
-                        <div className={styles.templateCard}>
-                            <div className={styles.templateIcon}>🌙</div>
-                            <div className={styles.templateName}>PBtA Like</div>
-                            <div className={styles.templateDesc}>Powered by the Apocalypse</div>
-                            <button className={styles.templateButton}>Usar Template</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Diálogo de Confirmação */}
-            <ConfirmDialog
-                isOpen={confirmDialog.isOpen}
-                title={confirmDialog.title}
-                message={confirmDialog.message}
-                onConfirm={confirmDialog.onConfirm}
-                onCancel={() => setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: null })}
+    // Se estiver no editor, renderizar SystemEditorV2
+    if (view === 'editor') {
+        return (
+            <SystemEditorV2
+                user={user}
+                systemId={editingSystem?.id}
+                initialData={editingSystem}
+                onBack={handleBackToList}
+                onSave={handleSaveSystem}
             />
+        );
+    }
+
+    // Lista de sistemas
+    return (
+        <div className={styles.container}>
+            {/* Header */}
+            <div className={styles.header}>
+                <button className={styles.backButton} onClick={onBack}>
+                    <ArrowLeft size={20} />
+                    <span>Voltar</span>
+                </button>
+                <div className={styles.headerTitle}>
+                    <Crown size={24} />
+                    <h1>Área dos Mestres</h1>
+                </div>
+            </div>
+
+            {/* Actions */}
+            <div className={styles.actions}>
+                <button className={styles.primaryButton} onClick={handleCreateSystem}>
+                    <Plus size={18} />
+                    Criar Novo Sistema
+                </button>
+            </div>
+
+            {/* Systems List */}
+            <div className={styles.systemsGrid}>
+                {systems.length === 0 ? (
+                    <div className={styles.emptyState}>
+                        <div className={styles.emptyIcon}>
+                            <FileText size={48} />
+                        </div>
+                        <h3>Nenhum sistema criado</h3>
+                        <p>Crie seu primeiro sistema de RPG para começar!</p>
+                        <button className={styles.primaryButton} onClick={handleCreateSystem}>
+                            <Plus size={18} />
+                            Criar Sistema
+                        </button>
+                    </div>
+                ) : (
+                    systems.map(system => (
+                        <div key={system.id} className={styles.systemCard}>
+                            <div className={styles.systemIcon}>{system.metadata?.icon || '🎲'}</div>
+                            <h3>{system.metadata?.name || 'Sistema sem nome'}</h3>
+                            <p>{system.fields?.length || 0} campos</p>
+                            <button
+                                className={styles.editButton}
+                                onClick={() => handleEditSystem(system)}
+                            >
+                                Editar
+                            </button>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Dev Tools */}
+            <div className={styles.devTools}>
+                <button
+                    className={styles.devButton}
+                    onClick={() => setView('diagnostics')}
+                >
+                    <Wrench size={16} />
+                    Core Diagnostics
+                </button>
+            </div>
+
+            {/* Template Selection Modal */}
+            {showTemplateModal && (
+                <div className={styles.modalOverlay} onClick={() => setShowTemplateModal(false)}>
+                    <div className={styles.templateModal} onClick={e => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h2>Escolha um Template</h2>
+                            <button className={styles.closeButton} onClick={() => setShowTemplateModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className={styles.templateGrid}>
+                            {/* Opção em branco */}
+                            <button
+                                className={styles.templateCard}
+                                onClick={() => handleSelectTemplate('blank')}
+                            >
+                                <div className={styles.templateIcon} style={{ background: '#374151' }}>
+                                    <Plus size={32} />
+                                </div>
+                                <h3>Em Branco</h3>
+                                <p>Comece do zero com um sistema vazio</p>
+                            </button>
+
+                            {/* Templates pré-definidos */}
+                            {SYSTEM_TEMPLATES.map(template => (
+                                <button
+                                    key={template.id}
+                                    className={styles.templateCard}
+                                    onClick={() => handleSelectTemplate(template.id)}
+                                >
+                                    <div
+                                        className={styles.templateIcon}
+                                        style={{ background: template.color + '33', color: template.color }}
+                                    >
+                                        <span style={{ fontSize: '2rem' }}>{template.icon}</span>
+                                    </div>
+                                    <h3>{template.name}</h3>
+                                    <p>{template.description}</p>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

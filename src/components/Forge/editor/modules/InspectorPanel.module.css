@@ -1,0 +1,581 @@
+/* ============================================
+   INSPECTOR PANEL - Unity Style
+   ============================================ */
+
+.inspector {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #111116;
+    overflow: hidden;
+}
+
+/* Header */
+.header {
+    height: 28px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    background: #19191f;
+    border-bottom: 1px solid #1e1e26;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+}
+
+/* Content */
+.content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    touch-action: pan-y;
+}
+
+/* Widget Header */
+.widgetHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #16161c;
+    border-bottom: 1px solid #1e1e26;
+}
+
+.widgetIcon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(139, 92, 246, 0.15);
+    border-radius: 6px;
+    color: #a78bfa;
+}
+
+.widgetInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.widgetName {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ddd;
+}
+
+.widgetType {
+    font-size: 0.65rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Section */
+.section {
+    border-bottom: 1px solid #1e1e26;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: #19191f;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.1s;
+}
+
+.sectionHeader:hover {
+    background: #1e1e26;
+}
+
+.sectionToggle {
+    color: #555;
+    display: flex;
+    align-items: center;
+}
+
+.sectionIcon {
+    color: #666;
+}
+
+.sectionTitle {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.sectionBody {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #111116;
+}
+
+/* Field Rows */
+.fieldRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+/* Field */
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.field label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.field input[type="number"],
+.field input[type="text"],
+.field select {
+    width: 100%;
+    padding: 6px 8px;
+    background: #0c0c0f;
+    border: 1px solid #2a2a35;
+    border-radius: 4px;
+    color: #ccc;
+    font-size: 0.8rem;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.15s;
+}
+
+.field input[type="number"]:focus,
+.field input[type="text"]:focus,
+.field select:focus {
+    border-color: #8b5cf6;
+    background: #12121a;
+}
+
+.field input[type="number"]:hover,
+.field input[type="text"]:hover,
+.field select:hover {
+    border-color: #3a3a45;
+}
+
+/* Color Input */
+.colorInput {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background: #0c0c0f;
+    border: 1px solid #2a2a35;
+    border-radius: 4px;
+}
+
+.colorInput input[type="color"] {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    background: none;
+}
+
+.colorInput input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.colorInput input[type="color"]::-webkit-color-swatch {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.colorValue {
+    font-size: 0.7rem;
+    color: #888;
+    font-family: monospace;
+    text-transform: uppercase;
+}
+
+/* Slider */
+.sliderWrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rangeInput {
+    flex: 1;
+    accent-color: #8b5cf6;
+}
+
+.sliderInput {
+    width: 55px;
+    padding: 5px 6px;
+    background: #0c0c0f;
+    border: 1px solid #2a2a35;
+    border-radius: 4px;
+    color: #ccc;
+    font-size: 0.75rem;
+    font-family: monospace;
+    text-align: center;
+    outline: none;
+}
+
+.sliderInput:focus {
+    border-color: #8b5cf6;
+    background: #12121a;
+}
+
+/* Align Buttons */
+.alignButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.alignButtons label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 2px;
+    background: #0c0c0f;
+    border: 1px solid #2a2a35;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.buttonGroup button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.1s;
+}
+
+.buttonGroup button:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #999;
+}
+
+.buttonGroup button.active {
+    background: rgba(139, 92, 246, 0.2);
+    color: #a78bfa;
+}
+
+/* Empty State */
+.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 40px 20px;
+    color: #444;
+    text-align: center;
+    height: 100%;
+}
+
+.empty span {
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.empty p {
+    font-size: 0.75rem;
+    color: #444;
+    margin: 0;
+}
+
+/* Scrollbar */
+.content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.content::-webkit-scrollbar-thumb {
+    background: #2a2a35;
+    border-radius: 3px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+    background: #3a3a45;
+}
+
+/* ============================================
+   COMPONENT SYSTEM
+   ============================================ */
+
+/* Component Section */
+.componentSection {
+    margin-bottom: 8px;
+    background: rgba(139, 92, 246, 0.05);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.componentHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: rgba(139, 92, 246, 0.1);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #a78bfa;
+}
+
+.componentIcon {
+    color: #8b5cf6;
+}
+
+.componentHeader span {
+    flex: 1;
+}
+
+.removeComponentBtn {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s;
+}
+
+.removeComponentBtn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.componentBody {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Add Component */
+.addComponentWrapper {
+    position: relative;
+    margin-top: 12px;
+    padding: 0 8px 8px;
+}
+
+.addComponentBtn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px;
+    background: rgba(139, 92, 246, 0.08);
+    border: 1px dashed rgba(139, 92, 246, 0.3);
+    color: #a78bfa;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.addComponentBtn:hover {
+    background: rgba(139, 92, 246, 0.15);
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
+/* Component Menu */
+.componentMenu {
+    position: absolute;
+    top: 100%;
+    left: 8px;
+    right: 8px;
+    background: #16161c;
+    border: 1px solid #2a2a35;
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    z-index: 100;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.componentMenuItem {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: none;
+    border: none;
+    color: #ccc;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.componentMenuItem:hover:not(.disabled) {
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.componentMenuItem.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.componentMenuInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.componentMenuInfo span {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.componentMenuInfo small {
+    font-size: 0.65rem;
+    color: #666;
+}
+
+/* Toggle Group */
+.toggleGroup {
+    display: flex;
+    gap: 4px;
+}
+
+.toggleBtn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 8px;
+    background: #0c0c0f;
+    border: 1px solid #2a2a35;
+    color: #888;
+    font-size: 0.7rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.toggleBtn:hover:not(.active) {
+    background: #16161c;
+    color: #aaa;
+}
+
+.toggleBtn.active {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: #8b5cf6;
+    color: #a78bfa;
+}
+
+/* Checkbox Field */
+.checkboxField {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkboxField input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #8b5cf6;
+}
+
+.checkboxField label {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+/* Preset Grid */
+.presetGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+}
+
+.presetBtn {
+    padding: 6px 4px;
+    background: #0c0c0f;
+    border: 1px solid #2a2a35;
+    color: #888;
+    font-size: 0.65rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+}
+
+.presetBtn:hover:not(.active) {
+    background: #16161c;
+    color: #aaa;
+}
+
+.presetBtn.active {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: #8b5cf6;
+    color: #a78bfa;
+}
+
+/* Field Hint */
+.fieldHint {
+    display: block;
+    font-size: 0.65rem;
+    color: #555;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+/* Field Preview (RPG Widgets) */
+.fieldPreview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    background: rgba(139, 92, 246, 0.08);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.previewLabel {
+    color: #888;
+    font-weight: 500;
+}
+
+.fieldPreview span:last-child {
+    color: #a78bfa;
+    font-weight: 600;
+}
